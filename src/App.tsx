@@ -7,6 +7,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from 'react-helmet-async';
 import { AuthProvider } from "@/hooks/useAuth";
+import { CartProvider } from "@/contexts/CartContext";
+import CartDrawer from "@/components/CartDrawer";
 import Breadcrumbs from "./components/Breadcrumbs";
 
 // Lazy load pages for better bundle splitting
@@ -32,24 +34,27 @@ const App: React.FC = () => {
     <HelmetProvider>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Breadcrumbs />
-              <Suspense fallback={<PageLoader />}>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/auth" element={<AuthPage />} />
-                  <Route path="/category/:category" element={<CategoryPage />} />
-                  <Route path="/search" element={<SearchPage />} />
-                  <Route path="/contact" element={<ContactPage />} />
-                  <Route path="/admin" element={<AdminPage />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Suspense>
-            </BrowserRouter>
-          </TooltipProvider>
+          <CartProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Breadcrumbs />
+                <Suspense fallback={<PageLoader />}>
+                  <Routes>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/auth" element={<AuthPage />} />
+                    <Route path="/category/:category" element={<CategoryPage />} />
+                    <Route path="/search" element={<SearchPage />} />
+                    <Route path="/contact" element={<ContactPage />} />
+                    <Route path="/admin" element={<AdminPage />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </Suspense>
+                <CartDrawer />
+              </BrowserRouter>
+            </TooltipProvider>
+          </CartProvider>
         </AuthProvider>
       </QueryClientProvider>
     </HelmetProvider>

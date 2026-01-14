@@ -1,41 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Madiba-Inspired Design System */
+/* Modern Clean E-Commerce Design System */
 @layer base {
   :root {
-    /* Brand Colors - Orange/Red and Dark Theme */
-    --primary: 14 100% 57%; /* Orange-Red #ff4500 */
+    /* Clean & Minimal Palette */
+    --primary: 221 83% 53%; /* Vibrant Blue #3b82f6 */
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 14 100% 50%;
+    --primary-hover: 221 83% 45%;
     
-    --secondary: 220 13% 18%; /* Dark Gray #2d3748 */
-    --secondary-foreground: 0 0% 100%;
-    --secondary-hover: 220 13% 25%;
+    --secondary: 220 14% 96%; /* Light Gray */
+    --secondary-foreground: 220 13% 18%;
+    --secondary-hover: 220 14% 90%;
     
     --accent: 142 76% 36%; /* WhatsApp Green #25d366 */
     --accent-foreground: 0 0% 100%;
     --accent-hover: 142 76% 30%;
     
-    --background: 0 0% 98%; /* Light gray background */
-    --foreground: 220 13% 18%; /* Dark text */
+    --background: 0 0% 100%; /* Pure White */
+    --foreground: 224 71% 4%; /* Near Black */
     
-    --muted: 210 40% 95%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
     
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 14 100% 57%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 221 83% 53%;
     
     --card: 0 0% 100%;
-    --card-foreground: 220 13% 18%;
+    --card-foreground: 224 71% 4%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
     
     --radius: 0.75rem;
     
-    /* Professional Typography Scale */
-    --font-heading: 'Inter', system-ui, -apple-system, sans-serif;
+    /* Premium Typography */
+    --font-heading: 'Space Grotesk', system-ui, -apple-system, sans-serif;
     --font-body: 'Inter', system-ui, -apple-system, sans-serif;
   }
 
@@ -43,73 +47,97 @@
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply bg-background text-foreground font-body antialiased;
+    @apply bg-background text-foreground antialiased;
     font-family: var(--font-body);
   }
   
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
-    @apply font-semibold leading-tight;
+    @apply font-semibold tracking-tight;
   }
 }
 
-/* Enhanced Component Variants */
+/* Modern Component Variants */
 @layer components {
+  /* Buttons */
   .btn-primary {
-    @apply bg-primary text-primary-foreground hover:bg-primary-hover px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-md hover:shadow-lg;
+    @apply bg-primary text-primary-foreground hover:bg-primary-hover px-6 py-3 rounded-xl font-medium transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98];
   }
   
   .btn-secondary {
-    @apply bg-secondary text-secondary-foreground hover:bg-secondary-hover px-6 py-3 rounded-lg font-medium transition-all duration-200;
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary-hover px-6 py-3 rounded-xl font-medium transition-all duration-200;
   }
   
   .btn-whatsapp {
-    @apply bg-accent text-accent-foreground hover:bg-accent-hover px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 shadow-sm hover:shadow-md;
+    @apply bg-accent text-accent-foreground hover:bg-accent-hover px-4 py-2 rounded-xl font-medium transition-all duration-200 flex items-center gap-2;
   }
   
+  /* Cards */
   .product-card {
-    @apply bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 relative;
+    @apply bg-card border border-border rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-primary/20;
   }
   
   .product-image {
-    @apply w-full h-64 object-cover bg-muted;
+    @apply w-full aspect-[4/3] object-cover bg-muted;
   }
   
   .product-title {
-    @apply font-medium text-foreground text-sm leading-relaxed mb-2 line-clamp-3;
+    @apply font-medium text-foreground text-sm leading-snug line-clamp-2;
   }
   
   .product-price {
-    @apply text-xl font-bold text-primary mb-3;
+    @apply text-lg font-bold text-foreground;
   }
-  
-  .offer-badge {
-    @apply absolute top-3 left-3 bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-bold z-10;
-  }
-  
-  .countdown-timer {
-    @apply bg-secondary text-secondary-foreground px-2 py-1 rounded text-xs font-mono;
-  }
-  
+
+  /* Navigation */
   .nav-link {
-    @apply text-foreground hover:text-primary font-medium transition-colors duration-200 px-3 py-2 rounded-md hover:bg-muted;
+    @apply text-muted-foreground hover:text-foreground font-medium transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-muted;
   }
   
-  .hero-section {
-    @apply bg-gradient-to-br from-primary/10 to-secondary/10 py-16;
-  }
-  
+  /* Sections */
   .section-title {
-    @apply text-2xl font-bold text-foreground mb-8 text-center;
+    @apply text-3xl md:text-4xl font-bold text-foreground mb-4 tracking-tight;
   }
   
-  .contact-link {
-    @apply flex items-center gap-2 text-foreground hover:text-primary transition-colors duration-200;
+  .section-subtitle {
+    @apply text-muted-foreground text-lg max-w-2xl;
   }
   
-  .carousel-container {
-    @apply relative overflow-hidden rounded-xl;
+  /* Container */
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
+
+/* Utility Classes */
+@layer utilities {
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  /* Glass Effect */
+  .glass {
+    @apply bg-white/80 backdrop-blur-xl border border-white/20;
+  }
+  
+  /* Gradient Text */
+  .gradient-text {
+    @apply bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent;
   }
 }
 
