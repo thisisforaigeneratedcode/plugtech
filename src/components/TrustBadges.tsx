@@ -1,53 +1,34 @@
-
-import { Shield, Award, Clock, MapPin } from 'lucide-react';
+import { Shield, Truck, Award, Headphones, CreditCard, RefreshCw } from 'lucide-react';
 
 const TrustBadges = () => {
+  const badges = [
+    { icon: Shield, title: '30-Day Warranty', description: 'All products covered' },
+    { icon: Truck, title: 'Fast Delivery', description: 'Nairobi & countrywide' },
+    { icon: Award, title: 'Quality Assured', description: '5+ years experience' },
+    { icon: Headphones, title: 'Expert Support', description: 'Technical assistance' },
+    { icon: CreditCard, title: 'M-Pesa Payment', description: 'Secure & convenient' },
+    { icon: RefreshCw, title: 'Easy Returns', description: 'Hassle-free process' },
+  ];
+
   return (
-    <div className="bg-gradient-to-r from-primary/5 to-secondary/5 py-8">
+    <section className="py-12 border-y border-border bg-muted/30">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-          <div className="flex flex-col items-center gap-2">
-            <div className="bg-primary/10 p-3 rounded-full">
-              <Shield className="w-6 h-6 text-primary" />
-            </div>
-            <div>
-              <h4 className="font-semibold text-sm">Quality Guaranteed</h4>
-              <p className="text-xs text-muted-foreground">30-day warranty</p>
-            </div>
-          </div>
-          
-          <div className="flex flex-col items-center gap-2">
-            <div className="bg-primary/10 p-3 rounded-full">
-              <Award className="w-6 h-6 text-primary" />
-            </div>
-            <div>
-              <h4 className="font-semibold text-sm">Certified Business</h4>
-              <p className="text-xs text-muted-foreground">Licensed dealer</p>
-            </div>
-          </div>
-          
-          <div className="flex flex-col items-center gap-2">
-            <div className="bg-primary/10 p-3 rounded-full">
-              <Clock className="w-6 h-6 text-primary" />
-            </div>
-            <div>
-              <h4 className="font-semibold text-sm">5+ Years Experience</h4>
-              <p className="text-xs text-muted-foreground">Trusted by 1000+ customers</p>
-            </div>
-          </div>
-          
-          <div className="flex flex-col items-center gap-2">
-            <div className="bg-primary/10 p-3 rounded-full">
-              <MapPin className="w-6 h-6 text-primary" />
-            </div>
-            <div>
-              <h4 className="font-semibold text-sm">Local Business</h4>
-              <p className="text-xs text-muted-foreground">Nairobi CBD location</p>
-            </div>
-          </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-6">
+          {badges.map((badge) => {
+            const Icon = badge.icon;
+            return (
+              <div key={badge.title} className="flex flex-col items-center text-center">
+                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+                  <Icon className="w-6 h-6 text-primary" />
+                </div>
+                <h3 className="font-medium text-foreground text-sm mb-1">{badge.title}</h3>
+                <p className="text-xs text-muted-foreground">{badge.description}</p>
+              </div>
+            );
+          })}
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

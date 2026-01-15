@@ -1,152 +1,162 @@
-
-import { useState, useRef, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback, memo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import ProductCard from './ProductCard';
-import ProductCarouselSkeleton from './ProductCarouselSkeleton';
+import ProductCardSkeleton from './ProductCardSkeleton';
 import { Product } from '@/types/product';
+import { cn } from '@/lib/utils';
 
 interface ProductCarouselProps {
   products: Product[];
   onAddToCart?: (product: Product) => void;
   autoScroll?: boolean;
-  title?: string;
   loading?: boolean;
 }
 
-const ProductCarousel = ({ 
+const ProductCarousel = memo(({ 
   products, 
   onAddToCart, 
   autoScroll = false,
-  title,
   loading = false
 }: ProductCarouselProps) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [itemsPerView, setItemsPerView] = useState(4);
-  const carouselRef = useRef<HTMLDivElement>(null);
-  
-  // Responsive items per view
-  useEffect(() => {
-    const updateItemsPerView = () => {
-      const width = window.innerWidth;
-      if (width < 640) {
-        setItemsPerView(1); // Mobile: 1 item
-      } else if (width < 768) {
-        setItemsPerView(2); // Small tablet: 2 items
-      } else if (width < 1024) {
-        setItemsPerView(2); // Tablet: 2 items
-      } else if (width < 1280) {
-        setItemsPerView(3); // Small desktop: 3 items
-      } else {
-        setItemsPerView(4); // Large desktop: 4 items
-      }
-    };
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(true);
 
-    updateItemsPerView();
-    window.addEventListener('resize', updateItemsPerView);
-    return () => window.removeEventListener('resize', updateItemsPerView);
+  const checkScrollability = useCallback(() => {
+    if (!scrollRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+    setCanScrollLeft(scrollLeft > 10);
+    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
   }, []);
 
-  const maxIndex = Math.max(0, products.length - itemsPerView);
-
   useEffect(() => {
-    if (autoScroll && products.length > itemsPerView && !loading) {
-      const interval = setInterval(() => {
-        setCurrentIndex(prev => (prev + 1) % (maxIndex + 1));
-      }, 3000);
+    const el = scrollRef.current;
+    if (!el) return;
+    
+    checkScrollability();
+    el.addEventListener('scroll', checkScrollability, { passive: true });
+    window.addEventListener('resize', checkScrollability);
+    
+    return () => {
+      el.removeEventListener('scroll', checkScrollability);
+      window.removeEventListener('resize', checkScrollability);
+    };
+  }, [checkScrollability, products]);
+
+  // Auto scroll functionality
+  useEffect(() => {
+    if (!autoScroll || loading || products.length === 0) return;
+    
+    const interval = setInterval(() => {
+      if (!scrollRef.current) return;
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
       
-      return () => clearInterval(interval);
-    }
-  }, [autoScroll, maxIndex, products.length, itemsPerView, loading]);
+      if (scrollLeft >= scrollWidth - clientWidth - 10) {
+        scrollRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        scrollRef.current.scrollBy({ left: 320, behavior: 'smooth' });
+      }
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, [autoScroll, loading, products.length]);
 
-  const scrollTo = (index: number) => {
-    setCurrentIndex(Math.max(0, Math.min(index, maxIndex)));
+  const scroll = (direction: 'left' | 'right') => {
+    if (!scrollRef.current) return;
+    const scrollAmount = scrollRef.current.clientWidth * 0.8;
+    scrollRef.current.scrollBy({
+      left: direction === 'left' ? -scrollAmount : scrollAmount,
+      behavior: 'smooth'
+    });
   };
 
-  const nextSlide = () => {
-    scrollTo(currentIndex + 1);
-  };
-
-  const prevSlide = () => {
-    scrollTo(currentIndex - 1);
-  };
-
-  // Show skeleton while loading
+  // Loading state
   if (loading) {
-    return <ProductCarouselSkeleton title={title} itemsPerView={itemsPerView} />;
-  }
-
-  if (products.length === 0) {
-    return null;
-  }
-
-  return (
-    <div className="relative">
-      {title && (
-        <h3 className="text-xl font-bold text-foreground mb-6">{title}</h3>
-      )}
-      
-      <div className="carousel-container">
-        <div 
-          ref={carouselRef}
-          className="flex transition-transform duration-500 ease-in-out gap-4 md:gap-6"
-          style={{
-            transform: `translateX(-${currentIndex * (100 / itemsPerView)}%)`
-          }}
-        >
-          {products.map((product) => (
-            <div 
-              key={product.id} 
-              className="flex-shrink-0"
-              style={{ width: `calc(${100 / itemsPerView}% - ${(itemsPerView - 1) * 1.5}rem / ${itemsPerView})` }}
-            >
-              <div className="h-full min-h-[500px] md:min-h-[550px]">
-                <ProductCard 
-                  product={product} 
-                  onAddToCart={onAddToCart}
-                />
-              </div>
+    return (
+      <div className="relative">
+        <div className="flex gap-4 overflow-hidden">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="flex-shrink-0 w-[280px] sm:w-[300px]">
+              <ProductCardSkeleton />
             </div>
           ))}
         </div>
-
-        {/* Navigation Arrows */}
-        {products.length > itemsPerView && (
-          <>
-            <button
-              onClick={prevSlide}
-              disabled={currentIndex === 0}
-              className="absolute left-2 top-1/2 -translate-y-1/2 bg-secondary/90 text-secondary-foreground p-3 rounded-full shadow-lg hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-10"
-            >
-              <ChevronLeft size={24} />
-            </button>
-            
-            <button
-              onClick={nextSlide}
-              disabled={currentIndex >= maxIndex}
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-secondary/90 text-secondary-foreground p-3 rounded-full shadow-lg hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed z-10"
-            >
-              <ChevronRight size={24} />
-            </button>
-          </>
-        )}
-
-        {/* Dots Indicator */}
-        {products.length > itemsPerView && (
-          <div className="flex justify-center space-x-2 mt-6">
-            {Array.from({ length: maxIndex + 1 }).map((_, index) => (
-              <button
-                key={index}
-                onClick={() => scrollTo(index)}
-                className={`w-3 h-3 rounded-full transition-colors ${
-                  currentIndex === index ? 'bg-primary' : 'bg-muted-foreground/30'
-                }`}
-              />
-            ))}
-          </div>
-        )}
       </div>
+    );
+  }
+
+  if (products.length === 0) {
+    return (
+      <div className="py-12 text-center text-muted-foreground">
+        No products available in this category.
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative group/carousel">
+      {/* Left Arrow */}
+      <button
+        onClick={() => scroll('left')}
+        disabled={!canScrollLeft}
+        className={cn(
+          "absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-background border border-border shadow-md flex items-center justify-center transition-all duration-200",
+          canScrollLeft 
+            ? "opacity-0 group-hover/carousel:opacity-100 hover:bg-muted" 
+            : "opacity-0 cursor-not-allowed"
+        )}
+        aria-label="Scroll left"
+      >
+        <ChevronLeft className="w-5 h-5 text-foreground" />
+      </button>
+
+      {/* Products Container */}
+      <div
+        ref={scrollRef}
+        className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth pb-2"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      >
+        {products.map((product) => (
+          <div 
+            key={product.id} 
+            className="flex-shrink-0 w-[280px] sm:w-[300px]"
+          >
+            <ProductCard 
+              product={product} 
+              onAddToCart={onAddToCart || (() => {})}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Right Arrow */}
+      <button
+        onClick={() => scroll('right')}
+        disabled={!canScrollRight}
+        className={cn(
+          "absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-background border border-border shadow-md flex items-center justify-center transition-all duration-200",
+          canScrollRight 
+            ? "opacity-0 group-hover/carousel:opacity-100 hover:bg-muted" 
+            : "opacity-0 cursor-not-allowed"
+        )}
+        aria-label="Scroll right"
+      >
+        <ChevronRight className="w-5 h-5 text-foreground" />
+      </button>
+
+      {/* Fade edges */}
+      <div className={cn(
+        "absolute left-0 top-0 bottom-2 w-8 bg-gradient-to-r from-background to-transparent pointer-events-none transition-opacity duration-200",
+        canScrollLeft ? "opacity-100" : "opacity-0"
+      )} />
+      <div className={cn(
+        "absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-background to-transparent pointer-events-none transition-opacity duration-200",
+        canScrollRight ? "opacity-100" : "opacity-0"
+      )} />
     </div>
   );
-};
+});
+
+ProductCarousel.displayName = 'ProductCarousel';
 
 export default ProductCarousel;

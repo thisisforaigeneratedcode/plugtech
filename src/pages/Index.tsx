@@ -1,427 +1,372 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { Laptop, Monitor, Gamepad2, HardDrive, Headphones, Star, Settings } from 'lucide-react';
+import { useMemo } from 'react';
+import { Link } from 'react-router-dom';
+import { Laptop, Monitor, Gamepad2, HardDrive, Headphones, Settings, ArrowRight, Shield, Truck, Award, ChevronRight } from 'lucide-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import ProductCard from '../components/ProductCard';
-import ProductCardSkeleton from '../components/ProductCardSkeleton';
-import ShoppingCart from '../components/ShoppingCart';
-import WhatsAppButton from '../components/WhatsAppButton';
+import ProductCarousel from '../components/ProductCarousel';
 import TrustBadges from '../components/TrustBadges';
 import WhyChooseUs from '../components/WhyChooseUs';
 import FAQ from '../components/FAQ';
 import StickyContact from '../components/StickyContact';
 import SEO from '../components/SEO';
 import { useProducts } from '../hooks/useProducts';
-import { Product, CartItem } from '@/types/product';
-import ProductCarousel from '../components/ProductCarousel';
-import FeaturedProductCard from '../components/FeaturedProductCard';
+import { useCart } from '@/contexts/CartContext';
+import WhatsAppButton from '../components/WhatsAppButton';
 
 const Index = () => {
   const { products, loading } = useProducts();
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isCartLoading, setIsCartLoading] = useState(true); // Add loading state
+  const { addItem, openCart, itemCount } = useCart();
 
-  // Load cart from localStorage with error handling
-  useEffect(() => {
-    const loadCart = () => {
-      try {
-        const savedCart = localStorage.getItem('plugtech-cart');
-        if (savedCart) {
-          const parsedCart = JSON.parse(savedCart);
-          // Validate the data structure
-          if (Array.isArray(parsedCart)) {
-            setCartItems(parsedCart);
-          }
-        }
-      } catch (error) {
-        console.error('Error loading cart from localStorage:', error);
-        // Clear corrupted data
-        localStorage.removeItem('plugtech-cart');
-      } finally {
-        setIsCartLoading(false);
-      }
-    };
-
-    loadCart();
-  }, []);
-
-  // Save cart to localStorage with error handling
-  useEffect(() => {
-    // Don't save during initial load
-    if (isCartLoading) return;
-    
-    try {
-      localStorage.setItem('plugtech-cart', JSON.stringify(cartItems));
-    } catch (error) {
-      console.error('Error saving cart to localStorage:', error);
-    }
-  }, [cartItems, isCartLoading]);
-
-  const addToCart = useCallback((product: Product) => {
-    setCartItems(prev => {
-      const existingItem = prev.find(item => item.id === product.id);
-      if (existingItem) {
-        return prev.map(item =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
-      return [...prev, { ...product, quantity: 1 }];
-    });
-  }, []);
-
-  const updateCartQuantity = useCallback((id: string, quantity: number) => {
-    if (quantity === 0) {
-      removeFromCart(id);
-    } else {
-      setCartItems(prev =>
-        prev.map(item =>
-          item.id === id ? { ...item, quantity } : item
-        )
-      );
-    }
-  }, []);
-
-  const removeFromCart = useCallback((id: string) => {
-    setCartItems(prev => prev.filter(item => item.id !== id));
-  }, []);
-
-  const clearCart = useCallback(() => {
-    setCartItems([]);
-  }, []);
-
-  const cartItemsCount = useMemo(() => 
-    cartItems.reduce((sum, item) => sum + item.quantity, 0),
-    [cartItems]
-  );
-
-  const categories = [
+  const categories = useMemo(() => [
     { 
       name: 'Laptops', 
+      slug: 'laptops',
       icon: Laptop, 
-      count: loading ? 0 : products.filter(p => p.category === 'laptops').length,
-      image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=200&h=150&fit=crop&crop=center'
+      count: products.filter(p => p.category === 'laptops').length,
     },
     { 
       name: 'Desktops', 
+      slug: 'desktops',
       icon: HardDrive, 
-      count: loading ? 0 : products.filter(p => p.category === 'desktops').length,
-      image: 'https://images.unsplash.com/photo-1547082299-de196ea013d6?w=200&h=150&fit=crop&crop=center'
+      count: products.filter(p => p.category === 'desktops').length,
     },
     { 
       name: 'Gaming', 
+      slug: 'gaming',
       icon: Gamepad2, 
-      count: loading ? 0 : products.filter(p => p.category === 'gaming').length,
-      image: 'https://images.unsplash.com/photo-1593640393637-2ed698cb2682?w=200&h=150&fit=crop&crop=center'
+      count: products.filter(p => p.category === 'gaming').length,
     },
     { 
       name: 'Monitors', 
+      slug: 'monitors',
       icon: Monitor, 
-      count: loading ? 0 : products.filter(p => p.category === 'monitors').length,
-      image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=200&h=150&fit=crop&crop=center'
+      count: products.filter(p => p.category === 'monitors').length,
     },
     { 
       name: 'All in One', 
+      slug: 'all-in-one',
       icon: Settings, 
-      count: loading ? 0 : products.filter(p => p.category === 'all-in-one').length,
-      image: 'https://images.unsplash.com/photo-1527443154391-507e9dc6c5cc?w=200&h=150&fit=crop&crop=center'
+      count: products.filter(p => p.category === 'all-in-one').length,
     },
     { 
       name: 'Accessories', 
+      slug: 'accessories',
       icon: Headphones, 
-      count: loading ? 0 : products.filter(p => p.category === 'accessories').length,
-      image: 'https://images.unsplash.com/photo-1527814050087-3793815479db?w=200&h=150&fit=crop&crop=center'
+      count: products.filter(p => p.category === 'accessories').length,
     },
-  ];
+  ], [products]);
 
-  // Memoize filtered products to prevent unnecessary recalculations
-  const featuredProducts = useMemo(() => 
-    loading ? [] : products.slice(0, 5),
-    [loading, products]
-  );
-  
-  const latestProducts = useMemo(() => 
-    loading ? [] : products.slice(0, 8),
-    [loading, products]
-  );
-  
-  const laptops = useMemo(() => 
-    loading ? [] : products.filter(p => p.category === 'laptops'),
-    [loading, products]
-  );
-  
-  const gaming = useMemo(() => 
-    loading ? [] : products.filter(p => p.category === 'gaming'),
-    [loading, products]
-  );
-  
-  const desktops = useMemo(() => 
-    loading ? [] : products.filter(p => p.category === 'desktops'),
-    [loading, products]
-  );
-  
-  const monitors = useMemo(() => 
-    loading ? [] : products.filter(p => p.category === 'monitors'),
-    [loading, products]
-  );
-  
-  const allInOne = useMemo(() => 
-    loading ? [] : products.filter(p => p.category === 'all-in-one'),
-    [loading, products]
-  );
-  
-  const accessories = useMemo(() => 
-    loading ? [] : products.filter(p => p.category === 'accessories'),
-    [loading, products]
-  );
+  // Memoized product lists
+  const latestProducts = useMemo(() => products.slice(0, 12), [products]);
+  const laptops = useMemo(() => products.filter(p => p.category === 'laptops'), [products]);
+  const gaming = useMemo(() => products.filter(p => p.category === 'gaming'), [products]);
+  const desktops = useMemo(() => products.filter(p => p.category === 'desktops'), [products]);
+  const monitors = useMemo(() => products.filter(p => p.category === 'monitors'), [products]);
+  const allInOne = useMemo(() => products.filter(p => p.category === 'all-in-one'), [products]);
+  const accessories = useMemo(() => products.filter(p => p.category === 'accessories'), [products]);
 
   return (
     <div className="min-h-screen bg-background">
       <SEO />
-      <Header cartItemsCount={cartItemsCount} onCartOpen={() => setIsCartOpen(true)} />
+      <Header cartItemsCount={itemCount} onCartOpen={openCart} />
 
-      {/* Simple M-Pesa Payment Info */}
-      <div className="bg-green-600 text-white py-2 shadow-sm">
+      {/* M-Pesa Banner - Clean and minimal */}
+      <div className="bg-emerald-600 text-white py-2">
         <div className="container mx-auto px-4">
-          <div className="flex items-center justify-center gap-4 text-sm">
-            <img 
-              src="https://upload.wikimedia.org/wikipedia/commons/1/15/M-PESA_LOGO-01.svg" 
-              alt="M-Pesa" 
-              className="h-5"
-            />
-            <span>Paybill: 714888</span>
-            <span>|</span>
-            <span>Acc: 281219</span>
+          <div className="flex items-center justify-center gap-3 text-sm font-medium">
+            <span>Pay via M-Pesa:</span>
+            <span className="bg-white/20 px-2 py-0.5 rounded">Paybill 714888</span>
+            <span className="bg-white/20 px-2 py-0.5 rounded">Acc 281219</span>
           </div>
         </div>
       </div>
 
-      {/* Hero Section - Always visible */}
-      <section className="bg-gradient-to-br from-primary/5 to-secondary/5 py-12 sm:py-16 lg:py-20">
+      {/* Hero Section - Clean, stable layout */}
+      <section className="bg-gradient-to-b from-muted/50 to-background py-16 md:py-24">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-foreground mb-4 sm:mb-6">
-                Quality Computer Hardware at 
-                <span className="text-primary"> Best Prices</span> in Nairobi
-              </h1>
-              <p className="text-sm sm:text-base lg:text-lg text-muted-foreground mb-6 sm:mb-8 leading-relaxed">
-                Find the perfect laptop, desktop, or computer accessory for your needs. 
-                We offer both new and refurbished computers with guaranteed quality and competitive prices. 
-                Located in Nairobi CBD with 5+ years of experience.
-              </p>
-              
-              <div className="flex flex-col sm:flex-row gap-4 mb-6 sm:mb-8">
-                <WhatsAppButton className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-lg transition-all duration-200 transform hover:scale-105 text-center font-medium" />
-                <a href="/category/laptops" className="bg-secondary text-secondary-foreground hover:bg-secondary/80 px-6 py-3 rounded-lg transition-all duration-200 transform hover:scale-105 text-center font-medium">
-                  Browse Laptops
-                </a>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-4 lg:gap-6 text-xs sm:text-sm text-muted-foreground">
-                <div className="flex items-center gap-1">
-                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                  <span>30-Day Warranty</span>
-                </div>
-                <div>5+ Years Experience</div>
-                <div>Nairobi CBD Location</div>
-                <div>Expert Support</div>
-              </div>
+          <div className="max-w-4xl mx-auto text-center">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-6">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+              </span>
+              Now Shipping Across Nairobi
             </div>
 
-            {/* Featured Product Card with hover rotation */}
-            <FeaturedProductCard 
-              products={featuredProducts}
-              onAddToCart={addToCart}
-              loading={loading}
-            />
+            {/* Headline */}
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6 leading-tight">
+              Premium Computers at
+              <span className="text-primary block sm:inline"> Unbeatable Prices</span>
+            </h1>
+
+            {/* Subheadline */}
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed">
+              Quality laptops, desktops, and gaming computers. New and refurbished options with warranty included. Located in Nairobi CBD.
+            </p>
+
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+              <Link 
+                to="/category/laptops"
+                className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-6 py-3 rounded-lg font-medium hover:bg-primary-hover transition-colors"
+              >
+                Shop Laptops
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+              <WhatsAppButton className="bg-accent text-accent-foreground px-6 py-3 rounded-lg font-medium hover:bg-accent-hover transition-colors inline-flex items-center gap-2" />
+            </div>
+
+            {/* Trust Indicators */}
+            <div className="flex flex-wrap items-center justify-center gap-8 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-primary" />
+                </div>
+                <div className="text-left">
+                  <div className="font-medium text-foreground">30-Day Warranty</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Truck className="w-5 h-5 text-primary" />
+                </div>
+                <div className="text-left">
+                  <div className="font-medium text-foreground">Fast Delivery</div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Award className="w-5 h-5 text-primary" />
+                </div>
+                <div className="text-left">
+                  <div className="font-medium text-foreground">5+ Years Experience</div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Trust Badges - Always visible */}
-      <TrustBadges />
-
-      {/* Categories - Always visible */}
-      <section className="py-12 sm:py-16">
+      {/* Categories - Clean grid */}
+      <section className="py-16 border-b border-border">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl sm:text-3xl font-bold text-foreground text-center mb-8 sm:mb-12">Shop by Category</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-3">Shop by Category</h2>
+            <p className="text-muted-foreground">Find the perfect computer for your needs</p>
+          </div>
+          
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
             {categories.map((category) => {
               const Icon = category.icon;
-              const categoryUrl = category.name === 'All in One' ? 'all-in-one' : category.name.toLowerCase();
               return (
-                <a
-                  key={category.name}
-                  href={`/category/${categoryUrl}`}
-                  className="group bg-card border border-border rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2 hover:scale-105"
+                <Link
+                  key={category.slug}
+                  to={`/category/${category.slug}`}
+                  className="group flex flex-col items-center p-6 bg-card rounded-xl border border-border hover:border-primary/30 hover:shadow-md transition-all duration-200"
                 >
-                  <div className="relative h-24 sm:h-32 lg:h-40">
-                    <img
-                      src={category.image}
-                      alt={`${category.name} - Best prices in Nairobi`}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center group-hover:bg-opacity-30 transition-all duration-300">
-                      <Icon className="w-6 h-6 sm:w-8 sm:h-8 lg:w-12 lg:h-12 text-white group-hover:scale-110 transition-transform duration-300" />
-                    </div>
+                  <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
+                    <Icon className="w-7 h-7 text-primary" />
                   </div>
-                  <div className="p-2 sm:p-3 lg:p-4 text-center">
-                    <h3 className="font-semibold text-foreground mb-1 text-xs sm:text-sm lg:text-base group-hover:text-primary transition-colors duration-200">{category.name}</h3>
-                    <p className="text-xs text-muted-foreground">
-                      {loading ? "Loading..." : `${category.count} Products Available`}
-                    </p>
-                  </div>
-                </a>
+                  <h3 className="font-medium text-foreground text-sm mb-1">{category.name}</h3>
+                  <p className="text-xs text-muted-foreground">
+                    {loading ? '...' : `${category.count} items`}
+                  </p>
+                </Link>
               );
             })}
           </div>
         </div>
       </section>
 
-      {/* Latest Products Carousel with loading state */}
-      <section className="py-12 sm:py-16 bg-muted/50">
+      {/* Latest Products */}
+      <section className="py-16">
         <div className="container mx-auto px-4">
-          <h2 className="text-2xl sm:text-3xl font-bold text-foreground text-center mb-8 sm:mb-12">Latest Products</h2>
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-2xl font-bold text-foreground mb-1">Latest Products</h2>
+              <p className="text-muted-foreground text-sm">Fresh arrivals just for you</p>
+            </div>
+            <Link 
+              to="/category/laptops" 
+              className="hidden sm:inline-flex items-center gap-1 text-primary hover:text-primary-hover font-medium text-sm transition-colors"
+            >
+              View All <ChevronRight className="w-4 h-4" />
+            </Link>
+          </div>
           <ProductCarousel 
             products={latestProducts}
-            onAddToCart={addToCart}
+            onAddToCart={addItem}
             autoScroll={true}
             loading={loading}
           />
-          <div className="text-center mt-8">
-            <a href="/category/laptops" className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-lg transition-all duration-200 transform hover:scale-105 inline-block font-medium">
-              View All Products
-            </a>
-          </div>
         </div>
       </section>
 
-      {/* Why Choose Us - Always visible */}
-      <WhyChooseUs />
+      {/* Trust Badges */}
+      <TrustBadges />
 
-      {/* Product Category Carousels with loading states */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-            <h2 className="text-2xl font-bold text-foreground">Popular Laptops in Nairobi</h2>
-            <a href="/category/laptops" className="text-primary hover:text-primary/80 font-medium transition-colors duration-200">
-              View All Laptops →
-            </a>
-          </div>
-          <ProductCarousel 
-            products={laptops}
-            onAddToCart={addToCart}
-            loading={loading}
-          />
-        </div>
-      </section>
-
-      {/* Gaming Carousel */}
-      <section className="py-16 bg-muted/50">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-            <h2 className="text-2xl font-bold text-foreground">Gaming Computers & Laptops</h2>
-            <a href="/category/gaming" className="text-primary hover:text-primary/80 font-medium transition-colors duration-200">
-              View All Gaming →
-            </a>
-          </div>
-          <ProductCarousel 
-            products={gaming}
-            onAddToCart={addToCart}
-            loading={loading}
-          />
-        </div>
-      </section>
-
-      {/* Desktops Carousel */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-            <h2 className="text-2xl font-bold text-foreground">Desktop Computers</h2>
-            <a href="/category/desktops" className="text-primary hover:text-primary/80 font-medium transition-colors duration-200">
-              View All Desktops →
-            </a>
-          </div>
-          <ProductCarousel 
-            products={desktops}
-            onAddToCart={addToCart}
-            loading={loading}
-          />
-        </div>
-      </section>
-
-      {/* All in One Carousel */}
-      {allInOne.length > 0 && (
-        <section className="py-16 bg-muted/50">
+      {/* Laptops Section */}
+      {laptops.length > 0 && (
+        <section className="py-16 bg-muted/30">
           <div className="container mx-auto px-4">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-              <h2 className="text-2xl font-bold text-foreground">All in One Computers</h2>
-              <a href="/category/all-in-one" className="text-primary hover:text-primary/80 font-medium transition-colors duration-200">
-                View All All in One →
-              </a>
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground mb-1">Popular Laptops</h2>
+                <p className="text-muted-foreground text-sm">Best selling laptops in Nairobi</p>
+              </div>
+              <Link 
+                to="/category/laptops" 
+                className="hidden sm:inline-flex items-center gap-1 text-primary hover:text-primary-hover font-medium text-sm transition-colors"
+              >
+                View All <ChevronRight className="w-4 h-4" />
+              </Link>
             </div>
             <ProductCarousel 
-              products={allInOne}
-              onAddToCart={addToCart}
+              products={laptops}
+              onAddToCart={addItem}
               loading={loading}
             />
           </div>
         </section>
       )}
 
-      {/* Monitors Carousel */}
-      <section className="py-16 bg-muted/50">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-            <h2 className="text-2xl font-bold text-foreground">Monitors</h2>
-            <a href="/category/monitors" className="text-primary hover:text-primary/80 font-medium transition-colors duration-200">
-              View All Monitors →
-            </a>
-          </div>
-          <ProductCarousel 
-            products={monitors}
-            onAddToCart={addToCart}
-            loading={loading}
-          />
-        </div>
-      </section>
+      {/* Why Choose Us */}
+      <WhyChooseUs />
 
-      {/* Accessories Carousel */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-            <h2 className="text-2xl font-bold text-foreground">Computer Accessories</h2>
-            <a href="/category/accessories" className="text-primary hover:text-primary/80 font-medium transition-colors duration-200">
-              View All Accessories →
-            </a>
+      {/* Gaming Section */}
+      {gaming.length > 0 && (
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground mb-1">Gaming Computers</h2>
+                <p className="text-muted-foreground text-sm">High-performance gaming machines</p>
+              </div>
+              <Link 
+                to="/category/gaming" 
+                className="hidden sm:inline-flex items-center gap-1 text-primary hover:text-primary-hover font-medium text-sm transition-colors"
+              >
+                View All <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <ProductCarousel 
+              products={gaming}
+              onAddToCart={addItem}
+              loading={loading}
+            />
           </div>
-          <ProductCarousel 
-            products={accessories}
-            onAddToCart={addToCart}
-            loading={loading}
-          />
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* FAQ Section - Always visible */}
+      {/* Desktops Section */}
+      {desktops.length > 0 && (
+        <section className="py-16 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground mb-1">Desktop Computers</h2>
+                <p className="text-muted-foreground text-sm">Powerful workstations for every need</p>
+              </div>
+              <Link 
+                to="/category/desktops" 
+                className="hidden sm:inline-flex items-center gap-1 text-primary hover:text-primary-hover font-medium text-sm transition-colors"
+              >
+                View All <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <ProductCarousel 
+              products={desktops}
+              onAddToCart={addItem}
+              loading={loading}
+            />
+          </div>
+        </section>
+      )}
+
+      {/* All in One Section */}
+      {allInOne.length > 0 && (
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground mb-1">All-in-One Computers</h2>
+                <p className="text-muted-foreground text-sm">Space-saving elegance</p>
+              </div>
+              <Link 
+                to="/category/all-in-one" 
+                className="hidden sm:inline-flex items-center gap-1 text-primary hover:text-primary-hover font-medium text-sm transition-colors"
+              >
+                View All <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <ProductCarousel 
+              products={allInOne}
+              onAddToCart={addItem}
+              loading={loading}
+            />
+          </div>
+        </section>
+      )}
+
+      {/* Monitors Section */}
+      {monitors.length > 0 && (
+        <section className="py-16 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground mb-1">Monitors</h2>
+                <p className="text-muted-foreground text-sm">Crystal clear displays</p>
+              </div>
+              <Link 
+                to="/category/monitors" 
+                className="hidden sm:inline-flex items-center gap-1 text-primary hover:text-primary-hover font-medium text-sm transition-colors"
+              >
+                View All <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <ProductCarousel 
+              products={monitors}
+              onAddToCart={addItem}
+              loading={loading}
+            />
+          </div>
+        </section>
+      )}
+
+      {/* Accessories Section */}
+      {accessories.length > 0 && (
+        <section className="py-16">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h2 className="text-2xl font-bold text-foreground mb-1">Accessories</h2>
+                <p className="text-muted-foreground text-sm">Complete your setup</p>
+              </div>
+              <Link 
+                to="/category/accessories" 
+                className="hidden sm:inline-flex items-center gap-1 text-primary hover:text-primary-hover font-medium text-sm transition-colors"
+              >
+                View All <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+            <ProductCarousel 
+              products={accessories}
+              onAddToCart={addItem}
+              loading={loading}
+            />
+          </div>
+        </section>
+      )}
+
+      {/* FAQ */}
       <FAQ />
 
+      {/* Footer */}
       <Footer />
 
-      {/* Sticky Contact Button for Mobile - Always visible */}
+      {/* Sticky Contact for Mobile */}
       <StickyContact />
-
-      <ShoppingCart
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        items={cartItems}
-        onUpdateQuantity={updateCartQuantity}
-        onRemoveItem={removeFromCart}
-        onClearCart={clearCart}
-      />
     </div>
   );
 };
