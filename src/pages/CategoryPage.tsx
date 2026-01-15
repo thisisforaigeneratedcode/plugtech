@@ -1,146 +1,178 @@
-
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ProductCard from '../components/ProductCard';
 import ProductCardSkeleton from '../components/ProductCardSkeleton';
-import ShoppingCart from '../components/ShoppingCart';
+import ProductQuickView from '../components/ProductQuickView';
 import { useProducts } from '../hooks/useProducts';
-import { useParams } from 'react-router-dom';
-import { Product, CartItem } from '@/types/product';
+import { useCart } from '@/contexts/CartContext';
+import { Product } from '@/types/product';
+import { ChevronRight, Home, SlidersHorizontal } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 const CategoryPage = () => {
   const { category } = useParams<{ category: string }>();
   const { products, loading } = useProducts();
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
+  const { itemCount, openCart } = useCart();
+  const [quickViewProduct, setQuickViewProduct] = useState<Product | null>(null);
+  const [sortBy, setSortBy] = useState<string>('newest');
+  const [conditionFilter, setConditionFilter] = useState<string>('all');
 
-  // Load cart from localStorage
-  useEffect(() => {
-    try {
-      const savedCart = localStorage.getItem('plugtech-cart');
-      if (savedCart) {
-        const parsedCart = JSON.parse(savedCart);
-        if (Array.isArray(parsedCart)) {
-          setCartItems(parsedCart);
-        }
-      }
-    } catch (error) {
-      console.error('Error loading cart:', error);
-      localStorage.removeItem('plugtech-cart');
-    }
-  }, []);
-
-  // Save cart to localStorage
-  useEffect(() => {
-    try {
-      localStorage.setItem('plugtech-cart', JSON.stringify(cartItems));
-    } catch (error) {
-      console.error('Error saving cart:', error);
-    }
-  }, [cartItems]);
-
-  const addToCart = useCallback((product: Product) => {
-    setCartItems(prev => {
-      const existingItem = prev.find(item => item.id === product.id);
-      if (existingItem) {
-        return prev.map(item =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
-      return [...prev, { ...product, quantity: 1 }];
-    });
-  }, []);
-
-  const updateCartQuantity = useCallback((id: string, quantity: number) => {
-    if (quantity === 0) {
-      removeFromCart(id);
-    } else {
-      setCartItems(prev =>
-        prev.map(item =>
-          item.id === id ? { ...item, quantity } : item
-        )
-      );
-    }
-  }, []);
-
-  const removeFromCart = useCallback((id: string) => {
-    setCartItems(prev => prev.filter(item => item.id !== id));
-  }, []);
-
-  const clearCart = useCallback(() => {
-    setCartItems([]);
-  }, []);
-
-  const cartItemsCount = useMemo(() => 
-    cartItems.reduce((sum, item) => sum + item.quantity, 0),
-    [cartItems]
-  );
-  
-  // Memoize filtered products
-  const filteredProducts = useMemo(() => 
-    loading ? [] : products.filter(product => product.category === category),
-    [products, category, loading]
-  );
-  
   const categoryTitles: Record<string, string> = {
     laptops: 'Laptops',
-    desktops: 'Desktop Computers',  
+    desktops: 'Desktop Computers',
     gaming: 'Gaming Computers',
     monitors: 'Monitors & Displays',
     accessories: 'Computer Accessories',
-    'all-in-one': 'All in One'
+    'all-in-one': 'All in One',
   };
 
   const categoryTitle = categoryTitles[category || ''] || 'Products';
 
+  // Filter and sort products
+  const filteredProducts = useMemo(() => {
+    if (loading) return [];
+    
+    let result = products.filter((product) => product.category === category);
+
+    // Apply condition filter
+    if (conditionFilter !== 'all') {
+      result = result.filter((product) => 
+        product.condition.toLowerCase() === conditionFilter.toLowerCase()
+      );
+    }
+
+    // Apply sorting
+    switch (sortBy) {
+      case 'price-low':
+        result.sort((a, b) => a.price - b.price);
+        break;
+      case 'price-high':
+        result.sort((a, b) => b.price - a.price);
+        break;
+      case 'name':
+        result.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'newest':
+      default:
+        result.sort((a, b) => new Date(b.date_added).getTime() - new Date(a.date_added).getTime());
+        break;
+    }
+
+    return result;
+  }, [products, category, loading, sortBy, conditionFilter]);
+
+  // Get unique conditions for filter
+  const conditions = useMemo(() => {
+    if (loading) return [];
+    const categoryProducts = products.filter((p) => p.category === category);
+    return [...new Set(categoryProducts.map((p) => p.condition))];
+  }, [products, category, loading]);
+
   return (
     <div className="min-h-screen bg-background">
-      <Header cartItemsCount={cartItemsCount} onCartOpen={() => setIsCartOpen(true)} />
-      
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-4">{categoryTitle}</h1>
-          <p className="text-muted-foreground text-sm sm:text-base">
-            Quality {categoryTitle.toLowerCase()} at competitive prices. All products come with warranty and expert support.
-          </p>
+      <Header cartItemsCount={itemCount} onCartOpen={openCart} />
+
+      <div className="container mx-auto px-4 py-6">
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
+          <Link to="/" className="hover:text-primary transition-colors flex items-center gap-1">
+            <Home className="w-4 h-4" />
+            <span>Home</span>
+          </Link>
+          <ChevronRight className="w-4 h-4" />
+          <span className="text-foreground font-medium">{categoryTitle}</span>
+        </nav>
+
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{categoryTitle}</h1>
+            <p className="text-muted-foreground text-sm mt-1">
+              {loading ? 'Loading...' : `${filteredProducts.length} products found`}
+            </p>
+          </div>
+
+          {/* Filters */}
+          <div className="flex items-center gap-3">
+            <Select value={conditionFilter} onValueChange={setConditionFilter}>
+              <SelectTrigger className="w-[140px]">
+                <SlidersHorizontal className="w-4 h-4 mr-2" />
+                <SelectValue placeholder="Condition" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Conditions</SelectItem>
+                {conditions.map((condition) => (
+                  <SelectItem key={condition} value={condition.toLowerCase()}>
+                    {condition}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Sort by" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="newest">Newest First</SelectItem>
+                <SelectItem value="price-low">Price: Low to High</SelectItem>
+                <SelectItem value="price-high">Price: High to Low</SelectItem>
+                <SelectItem value="name">Name A-Z</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
+        {/* Products Grid */}
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {Array.from({ length: 8 }).map((_, index) => (
               <ProductCardSkeleton key={index} />
             ))}
           </div>
         ) : filteredProducts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredProducts.map((product) => (
-              <ProductCard 
-                key={product.id} 
-                product={product} 
-                onAddToCart={addToCart}
+              <ProductCard
+                key={product.id}
+                product={product}
+                onQuickView={() => setQuickViewProduct(product)}
               />
             ))}
           </div>
         ) : (
-          <div className="text-center py-16">
-            <h2 className="text-xl font-semibold text-foreground mb-2">No products available</h2>
-            <p className="text-muted-foreground">Check back soon for new {categoryTitle.toLowerCase()}.</p>
+          <div className="text-center py-16 bg-muted/30 rounded-xl">
+            <h2 className="text-xl font-semibold text-foreground mb-2">No products found</h2>
+            <p className="text-muted-foreground mb-4">
+              {conditionFilter !== 'all'
+                ? `No ${conditionFilter} ${categoryTitle.toLowerCase()} available.`
+                : `Check back soon for new ${categoryTitle.toLowerCase()}.`}
+            </p>
+            {conditionFilter !== 'all' && (
+              <Button variant="outline" onClick={() => setConditionFilter('all')}>
+                Clear Filters
+              </Button>
+            )}
           </div>
         )}
       </div>
 
       <Footer />
 
-      <ShoppingCart
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        items={cartItems}
-        onUpdateQuantity={updateCartQuantity}
-        onRemoveItem={removeFromCart}
-        onClearCart={clearCart}
+      {/* Quick View Modal */}
+      <ProductQuickView
+        product={quickViewProduct}
+        isOpen={!!quickViewProduct}
+        onClose={() => setQuickViewProduct(null)}
       />
     </div>
   );
