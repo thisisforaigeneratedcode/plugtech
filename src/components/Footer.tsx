@@ -1,9 +1,14 @@
 import { Phone, Instagram, Mail, MapPin, Clock, ExternalLink } from 'lucide-react';
-import { useState } from 'react';
+import { Link } from 'react-router-dom';
+
+const WhatsAppIcon = ({ className }: { className?: string }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+  </svg>
+);
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
-  const [showBadgeTooltip, setShowBadgeTooltip] = useState(false);
 
   const openCnBWhatsApp = () => {
     const phoneNumber = "254114399034";
@@ -25,184 +30,166 @@ const Footer = () => {
     window.open('https://cnbcode.com', '_blank');
   };
 
+  const quickLinks = [
+    { to: '/category/laptops', label: 'Laptops' },
+    { to: '/category/desktops', label: 'Desktops' },
+    { to: '/category/gaming', label: 'Gaming' },
+    { to: '/category/all-in-one', label: 'All in One' },
+    { to: '/category/monitors', label: 'Monitors' },
+    { to: '/category/accessories', label: 'Accessories' },
+  ];
+
   return (
-    <>
-      {/* Floating Badge - Hidden on Mobile, Visible on Desktop */}
-      <div className="hidden md:block fixed bottom-6 right-6 z-50">
-        <div 
-          className="relative"
-          onMouseEnter={() => setShowBadgeTooltip(true)}
-          onMouseLeave={() => setShowBadgeTooltip(false)}
-        >
-          <button
-            onClick={openCnBWebsite}
-            className="bg-foreground text-background px-4 py-2.5 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center gap-2 group animate-pulse hover:animate-none"
-            style={{ animationDuration: '3s' }}
-          >
-            <span className="text-xs font-semibold tracking-wide">CnB Code</span>
-            <ExternalLink className="w-3 h-3 opacity-60 group-hover:opacity-100 transition-opacity" />
-          </button>
-          
-          {showBadgeTooltip && (
-            <div className="absolute bottom-full right-0 mb-3 bg-foreground text-background px-4 py-2 rounded-lg shadow-xl whitespace-nowrap animate-in fade-in slide-in-from-bottom-2 duration-200">
-              <div className="text-xs font-medium">Need a website like this?</div>
-              <div className="text-xs text-primary font-semibold">cnbcode.com</div>
-              <div className="absolute top-full right-6 border-4 border-transparent border-t-foreground"></div>
+    <footer className="bg-muted border-t border-border mt-16">
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* Company Info */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4 text-primary">Plug Tech Business</h3>
+            <p className="text-muted-foreground mb-4 text-sm leading-relaxed">
+              Your trusted partner for quality computer hardware in Kenya. We provide the best laptops, 
+              desktops, and computer accessories at competitive prices.
+            </p>
+            <div className="flex gap-3">
+              <a 
+                href="https://instagram.com/collo_thee_plug" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="p-2.5 bg-background border border-border rounded-lg hover:border-primary/50 transition-colors"
+              >
+                <Instagram className="w-4 h-4" style={{ color: '#E4405F' }} />
+              </a>
+              <a 
+                href="https://tiktok.com/@plugtechbusiness" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="p-2.5 bg-background border border-border rounded-lg hover:border-primary/50 transition-colors"
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-.88-.05A6.33 6.33 0 0 0 5.76 20.5a6.34 6.34 0 0 0 10.86-4.43V7.83a8.2 8.2 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.8-.26z"/>
+                </svg>
+              </a>
+              <button 
+                onClick={() => {
+                  const phoneNumber = "254711483989";
+                  const message = "👋 Hello! I'm interested in your computer products.";
+                  window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
+                }}
+                className="p-2.5 bg-background border border-border rounded-lg hover:border-[#25D366]/50 transition-colors"
+              >
+                <WhatsAppIcon className="w-4 h-4 text-[#25D366]" />
+              </button>
             </div>
-          )}
+          </div>
+
+          {/* Quick Links */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+            <ul className="space-y-2">
+              {quickLinks.map((link) => (
+                <li key={link.to}>
+                  <Link 
+                    to={link.to} 
+                    className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+              <li>
+                <Link 
+                  to="/wishlist" 
+                  className="text-muted-foreground hover:text-primary transition-colors text-sm"
+                >
+                  My Wishlist
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Contact Info */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
+            <ul className="space-y-3">
+              <li className="flex items-center gap-3 text-sm">
+                <div className="p-1.5 bg-primary/10 rounded">
+                  <Phone className="w-3.5 h-3.5 text-primary" />
+                </div>
+                <a href="tel:0711483989" className="text-muted-foreground hover:text-primary transition-colors">
+                  0711 483 989
+                </a>
+              </li>
+              <li className="flex items-center gap-3 text-sm">
+                <div className="p-1.5 bg-[#25D366]/10 rounded">
+                  <WhatsAppIcon className="w-3.5 h-3.5 text-[#25D366]" />
+                </div>
+                <span className="text-muted-foreground">WhatsApp for Orders</span>
+              </li>
+              <li className="flex items-start gap-3 text-sm">
+                <div className="p-1.5 bg-primary/10 rounded mt-0.5">
+                  <MapPin className="w-3.5 h-3.5 text-primary" />
+                </div>
+                <div className="text-muted-foreground">
+                  <div>Rasumal House, Shop No. 5, 1st Floor</div>
+                  <div>Tom Mboya Street, Nairobi</div>
+                  <div className="text-primary font-medium mt-1">(Ask For Collins)</div>
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          {/* Business Hours */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Business Hours</h3>
+            <div className="flex items-start gap-3 text-sm">
+              <div className="p-1.5 bg-primary/10 rounded">
+                <Clock className="w-3.5 h-3.5 text-primary" />
+              </div>
+              <div className="text-muted-foreground space-y-1">
+                <div className="flex justify-between gap-4">
+                  <span>Mon - Sat:</span>
+                  <span className="font-medium text-foreground">9AM - 7PM</span>
+                </div>
+                <div className="text-muted-foreground/70">Closed on Sundays</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Section */}
+        <div className="border-t border-border mt-10 pt-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
+            <div className="flex flex-col md:flex-row items-center gap-3">
+              <p>&copy; {currentYear} Collo The Plug. All rights reserved.</p>
+              <span className="hidden md:inline text-border">|</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs">Made with ❤️ by</span>
+                <button 
+                  onClick={openCnBWhatsApp}
+                  className="text-xs font-semibold text-foreground hover:text-primary transition-colors"
+                >
+                  CnB
+                </button>
+                <span className="text-xs">×</span>
+                <button 
+                  onClick={openDmXWhatsApp}
+                  className="text-xs font-semibold text-foreground hover:text-primary transition-colors"
+                >
+                  DmX
+                </button>
+              </div>
+            </div>
+            <div className="flex gap-4 text-xs">
+              <span>Quality Guaranteed</span>
+              <span className="text-border">•</span>
+              <span>Competitive Prices</span>
+              <span className="text-border">•</span>
+              <span>Expert Support</span>
+            </div>
+          </div>
         </div>
       </div>
-
-      {/* Main Footer */}
-      <footer className="bg-muted mt-16">
-        <div className="container-custom py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* Company Info */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4 text-primary">Plug Tech Business</h3>
-              <p className="text-muted-foreground mb-4 text-sm">
-                Your trusted partner for quality computer hardware in Kenya. We provide the best laptops, 
-                desktops, and computer accessories at competitive prices.
-              </p>
-              <div className="flex gap-4">
-                <a 
-                  href="https://instagram.com/collo_thee_plug" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="p-2 bg-accent text-accent-foreground rounded-lg hover:bg-accent-hover transition-colors duration-200"
-                >
-                  <Instagram className="w-4 h-4" style={{ color: '#E4405F' }} />
-                </a>
-                <a 
-                  href="https://tiktok.com/@plugtechbusiness" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="p-2 bg-foreground text-background rounded-lg hover:opacity-80 transition-opacity duration-200"
-                >
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="#ff0050">
-                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-.88-.05A6.33 6.33 0 0 0 5.76 20.5a6.34 6.34 0 0 0 10.86-4.43V7.83a8.2 8.2 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.8-.26z"/>
-                  </svg>
-                </a>
-              </div>
-            </div>
-
-            {/* Quick Links */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
-              <ul className="space-y-2">
-                <li>
-                  <a href="/category/laptops" className="text-muted-foreground hover:text-primary transition-colors duration-200 text-sm">
-                    Laptops
-                  </a>
-                </li>
-                <li>
-                  <a href="/category/desktops" className="text-muted-foreground hover:text-primary transition-colors duration-200 text-sm">
-                    Desktops
-                  </a>
-                </li>
-                <li>
-                  <a href="/category/gaming" className="text-muted-foreground hover:text-primary transition-colors duration-200 text-sm">
-                    Gaming
-                  </a>
-                </li>
-                <li>
-                  <a href="/category/all-in-one" className="text-muted-foreground hover:text-primary transition-colors duration-200 text-sm">
-                    All in One
-                  </a>
-                </li>
-                <li>
-                  <a href="/category/monitors" className="text-muted-foreground hover:text-primary transition-colors duration-200 text-sm">
-                    Monitors
-                  </a>
-                </li>
-                <li>
-                  <a href="/category/accessories" className="text-muted-foreground hover:text-primary transition-colors duration-200 text-sm">
-                    Accessories
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Contact Info */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
-              <ul className="space-y-3">
-                <li className="flex items-center gap-2 text-sm">
-                  <Phone className="w-4 h-4 text-primary" />
-                  <a href="tel:0711483989" className="text-muted-foreground hover:text-primary transition-colors duration-200">
-                    0711 483 989
-                  </a>
-                </li>
-                <li className="flex items-center gap-2 text-sm">
-                  <Mail className="w-4 h-4 text-primary" />
-                  <span className="text-muted-foreground">WhatsApp for Orders</span>
-                </li>
-                <li className="flex items-start gap-2 text-sm">
-                  <MapPin className="w-4 h-4 text-primary mt-0.5" />
-                  <div className="text-muted-foreground">
-                    <div>Rasumal House, Shop No. 5, 1st Floor</div>
-                    <div>Tom Mboya Street, Nairobi</div>
-                    <div className="font-medium text-primary mt-1">(Ask For Collins)</div>
-                  </div>
-                </li>
-              </ul>
-            </div>
-
-            {/* Business Hours */}
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Business Hours</h3>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-primary" />
-                  <div>
-                    <div className="flex justify-between">
-                      <span>Mon - Sat:</span>
-                      <span>9AM - 7PM</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Closed on Sundays</span>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="border-t border-border mt-8 pt-8">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
-              <div className="flex flex-col md:flex-row items-center gap-3">
-                <p>&copy; {currentYear} Collo The Plug. All rights reserved.</p>
-                <span className="hidden md:inline text-border">|</span>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs">Designed & Built by</span>
-                  <button 
-                    onClick={openCnBWebsite}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-foreground/5 hover:bg-foreground/10 rounded-md transition-all duration-200 group"
-                  >
-                    <span className="text-xs font-semibold text-foreground">CnB Code</span>
-                    <ExternalLink className="w-3 h-3 text-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </button>
-                  <span className="text-xs">×</span>
-                  <button 
-                    onClick={openDmXWhatsApp}
-                    className="text-xs font-semibold text-foreground hover:text-primary transition-colors"
-                  >
-                    DmX
-                  </button>
-                </div>
-              </div>
-              <div className="flex gap-4 text-xs">
-                <span>Quality Guaranteed</span>
-                <span className="text-border">•</span>
-                <span>Competitive Prices</span>
-                <span className="text-border">•</span>
-                <span>Expert Support</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </footer>
-    </>
+    </footer>
   );
 };
 

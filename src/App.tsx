@@ -18,6 +18,7 @@ const SearchPage = lazy(() => import("./pages/SearchPage"));
 const ContactPage = lazy(() => import("./pages/ContactPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const AuthPage = lazy(() => import("./pages/AuthPage"));
+const WishlistPage = lazy(() => import("./pages/WishlistPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Loading fallback component
@@ -47,6 +48,7 @@ const App: React.FC = () => {
                     <Route path="/category/:category" element={<CategoryPage />} />
                     <Route path="/search" element={<SearchPage />} />
                     <Route path="/contact" element={<ContactPage />} />
+                    <Route path="/wishlist" element={<WishlistPage />} />
                     <Route path="/admin" element={<AdminPage />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
