@@ -1,5 +1,4 @@
-
-import { MessageCircle } from 'lucide-react';
+import WhatsAppIcon from './icons/WhatsAppIcon';
 
 interface WhatsAppButtonProps {
   productName?: string;
@@ -11,6 +10,8 @@ interface WhatsAppButtonProps {
     quantity: number;
   }>;
   className?: string;
+  showLabel?: boolean;
+  label?: string;
 }
 
 const WhatsAppButton = ({ 
@@ -18,13 +19,14 @@ const WhatsAppButton = ({
   productPrice, 
   productUrl, 
   cartItems, 
-  className = "" 
+  className = "",
+  showLabel = true,
+  label
 }: WhatsAppButtonProps) => {
   const phoneNumber = "254711483989";
 
   const generateMessage = () => {
     if (cartItems && cartItems.length > 0) {
-      // Multi-product cart message
       let message = "🛒 *CART CHECKOUT REQUEST*\n\n";
       message += "Hello! I would like to purchase the following items:\n\n";
       let total = 0;
@@ -42,7 +44,6 @@ const WhatsAppButton = ({
       message += "Thank you! 🙏";
       return message;
     } else if (productName && productPrice) {
-      // Single product message with better formatting
       let message = "🚀 *QUICK ORDER REQUEST*\n\n";
       message += "Hello! I'm interested in purchasing:\n\n";
       message += `📱 *Product:* ${productName}\n`;
@@ -62,7 +63,6 @@ const WhatsAppButton = ({
       return message;
     }
     
-    // General inquiry
     return "👋 Hello!\n\nI'm interested in your computer products and would like to see your catalog.\n\nPlease share available products and pricing.\n\nThank you! 🙏";
   };
 
@@ -73,13 +73,15 @@ const WhatsAppButton = ({
     window.open(whatsappUrl, '_blank');
   };
 
+  const buttonLabel = label || (cartItems ? 'WhatsApp Checkout' : 'Quick Order');
+
   return (
     <button
       onClick={openWhatsApp}
       className={className}
     >
-      <MessageCircle className="w-4 h-4" />
-      {cartItems ? 'WhatsApp Checkout' : 'Quick Order'}
+      <WhatsAppIcon className="w-5 h-5" />
+      {showLabel && <span>{buttonLabel}</span>}
     </button>
   );
 };

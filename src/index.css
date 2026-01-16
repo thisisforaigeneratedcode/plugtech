@@ -1,46 +1,52 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Modern Clean E-Commerce Design System */
+/* Premium E-Commerce Design System - Warm & Distinctive */
 @layer base {
   :root {
-    /* Clean & Minimal Palette */
-    --primary: 221 83% 53%; /* Vibrant Blue #3b82f6 */
+    /* Warm Premium Palette - Copper/Bronze tones */
+    --primary: 24 90% 50%; /* Warm Copper #f97316 */
     --primary-foreground: 0 0% 100%;
-    --primary-hover: 221 83% 45%;
+    --primary-hover: 24 90% 42%;
     
-    --secondary: 220 14% 96%; /* Light Gray */
-    --secondary-foreground: 220 13% 18%;
-    --secondary-hover: 220 14% 90%;
+    --secondary: 30 15% 95%; /* Warm Gray */
+    --secondary-foreground: 30 10% 20%;
+    --secondary-hover: 30 15% 88%;
     
-    --accent: 142 76% 36%; /* WhatsApp Green #25d366 */
+    --accent: 142 76% 36%; /* WhatsApp Green */
     --accent-foreground: 0 0% 100%;
     --accent-hover: 142 76% 30%;
     
-    --background: 0 0% 100%; /* Pure White */
-    --foreground: 224 71% 4%; /* Near Black */
+    --background: 30 20% 99%; /* Warm White */
+    --foreground: 30 10% 10%; /* Warm Black */
     
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 9% 46%;
+    --muted: 30 15% 95%;
+    --muted-foreground: 30 8% 45%;
     
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 221 83% 53%;
+    --border: 30 15% 90%;
+    --input: 30 15% 90%;
+    --ring: 24 90% 50%;
     
     --card: 0 0% 100%;
-    --card-foreground: 224 71% 4%;
+    --card-foreground: 30 10% 10%;
     
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
     
-    --radius: 0.75rem;
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    
+    --warning: 45 93% 47%;
+    --warning-foreground: 0 0% 0%;
+    
+    --radius: 0.625rem;
     
     /* Premium Typography */
-    --font-heading: 'Space Grotesk', system-ui, -apple-system, sans-serif;
-    --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-heading: 'Outfit', system-ui, -apple-system, sans-serif;
+    --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   }
 
   * {
@@ -49,11 +55,14 @@
 
   html {
     scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply bg-background text-foreground;
     font-family: var(--font-body);
+    font-feature-settings: "ss01", "ss02";
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -62,24 +71,24 @@
   }
 }
 
-/* Modern Component Variants */
+/* Premium Component Styles */
 @layer components {
   /* Buttons */
   .btn-primary {
-    @apply bg-primary text-primary-foreground hover:bg-primary-hover px-6 py-3 rounded-xl font-medium transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98];
+    @apply bg-primary text-primary-foreground hover:bg-primary-hover px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-sm hover:shadow-md active:scale-[0.98];
   }
   
   .btn-secondary {
-    @apply bg-secondary text-secondary-foreground hover:bg-secondary-hover px-6 py-3 rounded-xl font-medium transition-all duration-200;
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary-hover px-6 py-3 rounded-lg font-medium transition-all duration-200;
   }
   
   .btn-whatsapp {
-    @apply bg-accent text-accent-foreground hover:bg-accent-hover px-4 py-2 rounded-xl font-medium transition-all duration-200 flex items-center gap-2;
+    @apply bg-accent text-accent-foreground hover:bg-accent-hover px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2;
   }
   
   /* Cards */
   .product-card {
-    @apply bg-card border border-border rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-primary/20;
+    @apply bg-card border border-border rounded-xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-primary/30 hover:-translate-y-0.5;
   }
   
   .product-image {
@@ -101,16 +110,21 @@
   
   /* Sections */
   .section-title {
-    @apply text-3xl md:text-4xl font-bold text-foreground mb-4 tracking-tight;
+    @apply text-2xl md:text-3xl font-bold text-foreground mb-3 tracking-tight;
   }
   
   .section-subtitle {
-    @apply text-muted-foreground text-lg max-w-2xl;
+    @apply text-muted-foreground text-base;
   }
   
   /* Container */
   .container-custom {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Premium badge */
+  .badge-premium {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold;
   }
 }
 
@@ -137,29 +151,59 @@
   
   /* Gradient Text */
   .gradient-text {
-    @apply bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent;
-  }
-}
-
-/* Enhanced Utility Classes */
-@layer utilities {
-  .line-clamp-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    @apply bg-gradient-to-r from-primary to-warning bg-clip-text text-transparent;
   }
   
-  .container-custom {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  /* Smooth scroll container */
+  .scroll-smooth-x {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
   
+  .scroll-smooth-x::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Animate scroll */
   .animate-scroll {
-    animation: scroll 20s linear infinite;
+    animation: scroll 25s linear infinite;
   }
   
   @keyframes scroll {
     0% { transform: translateX(0); }
-    100% { transform: translateX(-100%); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* Hero gradient animation */
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient 8s ease infinite;
+  }
+
+  @keyframes gradient {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  /* Float animation */
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  /* Pulse subtle */
+  .animate-pulse-subtle {
+    animation: pulse-subtle 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-subtle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
   }
 }

@@ -14,6 +14,8 @@ import Breadcrumbs from "./components/Breadcrumbs";
 // Lazy load pages for better bundle splitting
 const Index = lazy(() => import("./pages/Index"));
 const CategoryPage = lazy(() => import("./pages/CategoryPage"));
+const ProductPage = lazy(() => import("./pages/ProductPage"));
+const ComparePage = lazy(() => import("./pages/ComparePage"));
 const SearchPage = lazy(() => import("./pages/SearchPage"));
 const ContactPage = lazy(() => import("./pages/ContactPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
@@ -46,6 +48,8 @@ const App: React.FC = () => {
                     <Route path="/" element={<Index />} />
                     <Route path="/auth" element={<AuthPage />} />
                     <Route path="/category/:category" element={<CategoryPage />} />
+                    <Route path="/product/:productId" element={<ProductPage />} />
+                    <Route path="/compare" element={<ComparePage />} />
                     <Route path="/search" element={<SearchPage />} />
                     <Route path="/contact" element={<ContactPage />} />
                     <Route path="/wishlist" element={<WishlistPage />} />

@@ -1,90 +1,183 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Shield, Truck, Award } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { ArrowRight, Shield, Truck, Award, ChevronLeft, ChevronRight } from 'lucide-react';
 import WhatsAppButton from './WhatsAppButton';
 
+const promotions = [
+  {
+    id: 1,
+    title: "Back to School Deals",
+    subtitle: "Student laptops from KSh 25,000",
+    cta: "Shop Now",
+    link: "/category/laptops",
+    gradient: "from-primary/90 via-primary to-orange-400",
+  },
+  {
+    id: 2,
+    title: "Gaming Setup Sale",
+    subtitle: "High-performance rigs ready to ship",
+    cta: "View Gaming",
+    link: "/category/gaming",
+    gradient: "from-violet-600 via-purple-600 to-fuchsia-500",
+  },
+  {
+    id: 3,
+    title: "Office Essentials",
+    subtitle: "Complete workstation packages available",
+    cta: "Browse Desktops",
+    link: "/category/desktops",
+    gradient: "from-emerald-600 via-teal-600 to-cyan-500",
+  }
+];
+
 const HeroSection = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+
+  useEffect(() => {
+    if (!isAutoPlaying) return;
+    
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % promotions.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [isAutoPlaying]);
+
+  const nextSlide = () => {
+    setIsAutoPlaying(false);
+    setCurrentSlide((prev) => (prev + 1) % promotions.length);
+  };
+
+  const prevSlide = () => {
+    setIsAutoPlaying(false);
+    setCurrentSlide((prev) => (prev - 1 + promotions.length) % promotions.length);
+  };
+
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-muted/30 via-background to-muted/50">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-[0.02]">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)`,
-          backgroundSize: '40px 40px'
-        }} />
+    <section className="relative overflow-hidden">
+      {/* Promotional Carousel */}
+      <div className="relative">
+        {promotions.map((promo, index) => (
+          <div
+            key={promo.id}
+            className={`transition-all duration-700 ease-out ${
+              index === currentSlide 
+                ? 'opacity-100 translate-x-0' 
+                : 'opacity-0 absolute inset-0 translate-x-full'
+            }`}
+          >
+            <div className={`bg-gradient-to-r ${promo.gradient} py-16 md:py-24 lg:py-32`}>
+              <div className="container mx-auto px-4">
+                <div className="max-w-4xl mx-auto text-center text-white">
+                  {/* Animated Badge */}
+                  <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-1.5 rounded-full text-sm font-medium mb-6 animate-pulse-subtle">
+                    <span className="relative flex h-2 w-2">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                    </span>
+                    Nairobi's Trusted Computer Shop
+                  </div>
+
+                  {/* Headline */}
+                  <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-4 leading-[1.1]">
+                    {promo.title}
+                  </h1>
+
+                  {/* Subheadline */}
+                  <p className="text-xl md:text-2xl text-white/90 max-w-2xl mx-auto mb-8 font-medium">
+                    {promo.subtitle}
+                  </p>
+
+                  {/* CTAs */}
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    <Link 
+                      to={promo.link}
+                      className="inline-flex items-center gap-2 bg-white text-foreground px-8 py-4 rounded-xl font-semibold hover:bg-white/90 transition-all duration-200 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                    >
+                      {promo.cta}
+                      <ArrowRight className="w-5 h-5" />
+                    </Link>
+                    <WhatsAppButton 
+                      className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/30 transition-all duration-200 border border-white/30"
+                      label="Chat with Us"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {/* Navigation Arrows */}
+        <button
+          onClick={prevSlide}
+          className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/30 transition-colors z-10"
+          aria-label="Previous slide"
+        >
+          <ChevronLeft className="w-6 h-6" />
+        </button>
+        <button
+          onClick={nextSlide}
+          className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm text-white flex items-center justify-center hover:bg-white/30 transition-colors z-10"
+          aria-label="Next slide"
+        >
+          <ChevronRight className="w-6 h-6" />
+        </button>
+
+        {/* Dots */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+          {promotions.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => {
+                setIsAutoPlaying(false);
+                setCurrentSlide(index);
+              }}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                index === currentSlide 
+                  ? 'w-8 bg-white' 
+                  : 'w-2 bg-white/50 hover:bg-white/70'
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
       </div>
 
-      <div className="container mx-auto px-4 py-16 md:py-24 lg:py-32 relative">
-        <div className="max-w-3xl mx-auto text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-sm font-medium mb-6">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-            </span>
-            Now Shipping Across Nairobi
-          </div>
-
-          {/* Headline */}
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-6">
-            Premium Computers
-            <span className="block text-primary">Unbeatable Prices</span>
-          </h1>
-
-          {/* Subheadline */}
-          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed">
-            Discover quality laptops, desktops, and gaming computers. New and refurbished options with warranty included. Located in Nairobi CBD.
-          </p>
-
-          {/* CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-            <Button asChild size="lg" className="h-12 px-8 text-base">
-              <Link to="/category/laptops">
-                Shop Laptops
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Link>
-            </Button>
-            <WhatsAppButton className="h-12 px-8 text-base bg-accent hover:bg-accent-hover text-accent-foreground rounded-lg font-medium inline-flex items-center gap-2" />
-          </div>
-
-          {/* Trust Indicators */}
-          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-12 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <Shield className="w-5 h-5 text-primary" />
+      {/* Trust Strip */}
+      <div className="bg-background border-b border-border">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-16">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Shield className="w-6 h-6 text-primary" />
               </div>
-              <div className="text-left">
-                <div className="font-medium text-foreground">30-Day Warranty</div>
-                <div className="text-xs">On all products</div>
+              <div>
+                <p className="font-semibold text-foreground">30-Day Warranty</p>
+                <p className="text-xs text-muted-foreground">On all products</p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <Truck className="w-5 h-5 text-primary" />
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Truck className="w-6 h-6 text-primary" />
               </div>
-              <div className="text-left">
-                <div className="font-medium text-foreground">Fast Delivery</div>
-                <div className="text-xs">Within Nairobi</div>
+              <div>
+                <p className="font-semibold text-foreground">Same-Day Delivery</p>
+                <p className="text-xs text-muted-foreground">Within Nairobi</p>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <Award className="w-5 h-5 text-primary" />
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                <Award className="w-6 h-6 text-primary" />
               </div>
-              <div className="text-left">
-                <div className="font-medium text-foreground">5+ Years</div>
-                <div className="text-xs">Trusted experience</div>
+              <div>
+                <p className="font-semibold text-foreground">5+ Years Trusted</p>
+                <p className="text-xs text-muted-foreground">Serving Nairobi</p>
               </div>
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Bottom wave */}
-      <div className="absolute bottom-0 left-0 right-0">
-        <svg viewBox="0 0 1440 60" fill="none" className="w-full h-auto text-background">
-          <path d="M0 60L60 55C120 50 240 40 360 35C480 30 600 30 720 32.5C840 35 960 40 1080 42.5C1200 45 1320 45 1380 45L1440 45V60H1380C1320 60 1200 60 1080 60C960 60 840 60 720 60C600 60 480 60 360 60C240 60 120 60 60 60H0V60Z" fill="currentColor"/>
-        </svg>
       </div>
     </section>
   );
