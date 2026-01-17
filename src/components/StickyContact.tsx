@@ -24,7 +24,7 @@ const StickyContact = () => {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 md:hidden flex flex-col items-end gap-2">
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
       {/* Expanded menu */}
       {isExpanded && (
         <div className="space-y-2 animate-in fade-in slide-in-from-bottom-2 duration-200">

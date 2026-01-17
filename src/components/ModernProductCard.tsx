@@ -1,4 +1,5 @@
 import { memo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Heart, Eye, ShoppingCart, Star } from 'lucide-react';
 import { Product } from '@/types/product';
 import { useCart } from '@/contexts/CartContext';
@@ -51,15 +52,15 @@ const ModernProductCard = memo(({ product, onQuickView }: ModernProductCardProps
 
   return (
     <div
-      className="group relative bg-card rounded-2xl border border-border overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-primary/20"
+      className="group relative bg-card rounded-2xl border border-border overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-primary/20 hover:-translate-y-1"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Image Container */}
-      <div className="relative aspect-[4/3] bg-muted overflow-hidden">
+      {/* Image Container - Wrapped in Link */}
+      <Link to={`/product/${product.id}`} className="relative aspect-[4/3] bg-muted overflow-hidden block">
         {/* Skeleton loader */}
         {!imageLoaded && (
-          <div className="absolute inset-0 bg-muted animate-pulse" />
+          <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted/50 animate-pulse" />
         )}
         
         <img
@@ -67,7 +68,7 @@ const ModernProductCard = memo(({ product, onQuickView }: ModernProductCardProps
           srcSet={getImageSrcSet(product.image, product.image_version)}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
           alt={product.name}
-          className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${
+          className={`w-full h-full object-cover transition-all duration-500 group-hover:scale-110 ${
             imageLoaded ? 'opacity-100' : 'opacity-0'
           }`}
           loading="lazy"
@@ -77,25 +78,25 @@ const ModernProductCard = memo(({ product, onQuickView }: ModernProductCardProps
 
         {/* Overlay Actions */}
         <div
-          className={`absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-between p-4 transition-opacity duration-300 ${
+          className={`absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-between p-4 transition-all duration-300 ${
             isHovered ? 'opacity-100' : 'opacity-0'
           }`}
         >
           {/* Top Actions */}
-          <div className="flex justify-end gap-2">
+          <div className={`flex justify-end gap-2 transition-all duration-300 ${isHovered ? 'translate-x-0' : 'translate-x-4'}`}>
             <button
               onClick={handleWishlist}
-              className={`w-9 h-9 rounded-full flex items-center justify-center transition-all backdrop-blur-sm ${
+              className={`w-10 h-10 rounded-full flex items-center justify-center transition-all backdrop-blur-md shadow-lg ${
                 inWishlist
-                  ? 'bg-red-500 text-white'
-                  : 'bg-white/90 text-foreground hover:bg-white hover:scale-110'
+                  ? 'bg-red-500 text-white scale-110'
+                  : 'bg-white/95 text-foreground hover:bg-white hover:scale-110'
               }`}
             >
               <Heart className={`w-4 h-4 ${inWishlist ? 'fill-current' : ''}`} />
             </button>
             <button
               onClick={handleQuickView}
-              className="w-9 h-9 rounded-full bg-white/90 text-foreground flex items-center justify-center hover:bg-white hover:scale-110 transition-all backdrop-blur-sm"
+              className="w-10 h-10 rounded-full bg-white/95 text-foreground flex items-center justify-center hover:bg-white hover:scale-110 transition-all backdrop-blur-md shadow-lg"
             >
               <Eye className="w-4 h-4" />
             </button>
@@ -105,7 +106,7 @@ const ModernProductCard = memo(({ product, onQuickView }: ModernProductCardProps
           <Button
             onClick={handleAddToCart}
             disabled={!product.in_stock}
-            className="w-full bg-white text-foreground hover:bg-primary hover:text-primary-foreground transition-all"
+            className="w-full bg-white text-foreground hover:bg-primary hover:text-primary-foreground transition-all shadow-lg"
             size="sm"
           >
             <ShoppingCart className="w-4 h-4 mr-2" />
@@ -116,16 +117,16 @@ const ModernProductCard = memo(({ product, onQuickView }: ModernProductCardProps
         {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
           {product.in_stock ? (
-            <Badge className="bg-emerald-500 hover:bg-emerald-500 text-white text-[10px] px-2 py-0.5">
+            <Badge className="bg-emerald-500 hover:bg-emerald-500 text-white text-[10px] px-2 py-0.5 shadow-md">
               In Stock
             </Badge>
           ) : (
-            <Badge variant="destructive" className="text-[10px] px-2 py-0.5">
+            <Badge variant="destructive" className="text-[10px] px-2 py-0.5 shadow-md">
               Sold Out
             </Badge>
           )}
         </div>
-      </div>
+      </Link>
 
       {/* Content */}
       <div className="p-4">
@@ -140,10 +141,12 @@ const ModernProductCard = memo(({ product, onQuickView }: ModernProductCardProps
           </Badge>
         </div>
 
-        {/* Title */}
-        <h3 className="font-medium text-foreground text-sm leading-snug line-clamp-2 mb-2 min-h-[2.5rem] group-hover:text-primary transition-colors">
-          {product.name}
-        </h3>
+        {/* Title - Linked */}
+        <Link to={`/product/${product.id}`}>
+          <h3 className="font-medium text-foreground text-sm leading-snug line-clamp-2 mb-2 min-h-[2.5rem] hover:text-primary transition-colors">
+            {product.name}
+          </h3>
+        </Link>
 
         {/* Rating */}
         <div className="flex items-center gap-1 mb-3">
