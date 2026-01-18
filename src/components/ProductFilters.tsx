@@ -12,24 +12,27 @@ export interface FilterState {
   priceRange: [number, number];
   conditions: string[];
   inStockOnly: boolean;
-  categories: string[];
+  ramOptions: string[];
+  storageOptions: string[];
 }
 
 interface ProductFiltersProps {
   filters: FilterState;
   onFiltersChange: (filters: FilterState) => void;
   maxPrice: number;
-  availableCategories: string[];
+  availableConditions: string[];
+  availableRam: string[];
+  availableStorage: string[];
   activeFilterCount: number;
 }
-
-const CONDITIONS = ['New', 'Refurbished', 'Ex UK'];
 
 const ProductFilters = memo(({
   filters,
   onFiltersChange,
   maxPrice,
-  availableCategories,
+  availableConditions,
+  availableRam,
+  availableStorage,
   activeFilterCount
 }: ProductFiltersProps) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -46,12 +49,20 @@ const ProductFilters = memo(({
     updateFilter('conditions', updated);
   };
 
-  const toggleCategory = (category: string) => {
-    const current = filters.categories;
-    const updated = current.includes(category)
-      ? current.filter(c => c !== category)
-      : [...current, category];
-    updateFilter('categories', updated);
+  const toggleRam = (ram: string) => {
+    const current = filters.ramOptions;
+    const updated = current.includes(ram)
+      ? current.filter(r => r !== ram)
+      : [...current, ram];
+    updateFilter('ramOptions', updated);
+  };
+
+  const toggleStorage = (storage: string) => {
+    const current = filters.storageOptions;
+    const updated = current.includes(storage)
+      ? current.filter(s => s !== storage)
+      : [...current, storage];
+    updateFilter('storageOptions', updated);
   };
 
   const clearFilters = () => {
@@ -59,7 +70,8 @@ const ProductFilters = memo(({
       priceRange: [0, maxPrice],
       conditions: [],
       inStockOnly: false,
-      categories: [],
+      ramOptions: [],
+      storageOptions: [],
     });
   };
 
@@ -67,7 +79,7 @@ const ProductFilters = memo(({
     <div className="space-y-6">
       {/* Price Range */}
       <Collapsible defaultOpen>
-        <CollapsibleTrigger className="flex items-center justify-between w-full py-2">
+        <CollapsibleTrigger className="flex items-center justify-between w-full py-2 hover:text-primary transition-colors">
           <span className="font-medium">Price Range</span>
           <ChevronDown className="w-4 h-4" />
         </CollapsibleTrigger>
@@ -77,61 +89,91 @@ const ProductFilters = memo(({
             onValueChange={(value) => updateFilter('priceRange', value as [number, number])}
             max={maxPrice}
             min={0}
-            step={1000}
+            step={5000}
             className="w-full"
           />
           <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <span>KSh {filters.priceRange[0].toLocaleString()}</span>
-            <span>KSh {filters.priceRange[1].toLocaleString()}</span>
+            <span className="bg-muted px-2 py-1 rounded">KSh {filters.priceRange[0].toLocaleString()}</span>
+            <span className="text-muted-foreground">—</span>
+            <span className="bg-muted px-2 py-1 rounded">KSh {filters.priceRange[1].toLocaleString()}</span>
           </div>
         </CollapsibleContent>
       </Collapsible>
 
       {/* Condition */}
-      <Collapsible defaultOpen>
-        <CollapsibleTrigger className="flex items-center justify-between w-full py-2">
-          <span className="font-medium">Condition</span>
-          <ChevronDown className="w-4 h-4" />
-        </CollapsibleTrigger>
-        <CollapsibleContent className="pt-4 space-y-3">
-          {CONDITIONS.map((condition) => (
-            <div key={condition} className="flex items-center space-x-3">
-              <Checkbox
-                id={`condition-${condition}`}
-                checked={filters.conditions.includes(condition)}
-                onCheckedChange={() => toggleCondition(condition)}
-              />
-              <Label
-                htmlFor={`condition-${condition}`}
-                className="text-sm font-normal cursor-pointer"
-              >
-                {condition}
-              </Label>
-            </div>
-          ))}
-        </CollapsibleContent>
-      </Collapsible>
-
-      {/* Categories */}
-      {availableCategories.length > 0 && (
+      {availableConditions.length > 0 && (
         <Collapsible defaultOpen>
-          <CollapsibleTrigger className="flex items-center justify-between w-full py-2">
-            <span className="font-medium">Category</span>
+          <CollapsibleTrigger className="flex items-center justify-between w-full py-2 hover:text-primary transition-colors">
+            <span className="font-medium">Condition</span>
             <ChevronDown className="w-4 h-4" />
           </CollapsibleTrigger>
           <CollapsibleContent className="pt-4 space-y-3">
-            {availableCategories.map((category) => (
-              <div key={category} className="flex items-center space-x-3">
+            {availableConditions.map((condition) => (
+              <div key={condition} className="flex items-center space-x-3">
                 <Checkbox
-                  id={`category-${category}`}
-                  checked={filters.categories.includes(category)}
-                  onCheckedChange={() => toggleCategory(category)}
+                  id={`condition-${condition}`}
+                  checked={filters.conditions.includes(condition)}
+                  onCheckedChange={() => toggleCondition(condition)}
                 />
                 <Label
-                  htmlFor={`category-${category}`}
-                  className="text-sm font-normal cursor-pointer capitalize"
+                  htmlFor={`condition-${condition}`}
+                  className="text-sm font-normal cursor-pointer"
                 >
-                  {category.replace('-', ' ')}
+                  {condition}
+                </Label>
+              </div>
+            ))}
+          </CollapsibleContent>
+        </Collapsible>
+      )}
+
+      {/* RAM */}
+      {availableRam.length > 0 && (
+        <Collapsible defaultOpen>
+          <CollapsibleTrigger className="flex items-center justify-between w-full py-2 hover:text-primary transition-colors">
+            <span className="font-medium">RAM</span>
+            <ChevronDown className="w-4 h-4" />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="pt-4 space-y-3">
+            {availableRam.map((ram) => (
+              <div key={ram} className="flex items-center space-x-3">
+                <Checkbox
+                  id={`ram-${ram}`}
+                  checked={filters.ramOptions.includes(ram)}
+                  onCheckedChange={() => toggleRam(ram)}
+                />
+                <Label
+                  htmlFor={`ram-${ram}`}
+                  className="text-sm font-normal cursor-pointer"
+                >
+                  {ram}
+                </Label>
+              </div>
+            ))}
+          </CollapsibleContent>
+        </Collapsible>
+      )}
+
+      {/* Storage */}
+      {availableStorage.length > 0 && (
+        <Collapsible defaultOpen>
+          <CollapsibleTrigger className="flex items-center justify-between w-full py-2 hover:text-primary transition-colors">
+            <span className="font-medium">Storage</span>
+            <ChevronDown className="w-4 h-4" />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="pt-4 space-y-3">
+            {availableStorage.map((storage) => (
+              <div key={storage} className="flex items-center space-x-3">
+                <Checkbox
+                  id={`storage-${storage}`}
+                  checked={filters.storageOptions.includes(storage)}
+                  onCheckedChange={() => toggleStorage(storage)}
+                />
+                <Label
+                  htmlFor={`storage-${storage}`}
+                  className="text-sm font-normal cursor-pointer"
+                >
+                  {storage}
                 </Label>
               </div>
             ))}
@@ -140,7 +182,7 @@ const ProductFilters = memo(({
       )}
 
       {/* In Stock Only */}
-      <div className="flex items-center space-x-3 py-2">
+      <div className="flex items-center space-x-3 py-2 border-t border-border pt-4">
         <Checkbox
           id="in-stock"
           checked={filters.inStockOnly}
@@ -159,7 +201,7 @@ const ProductFilters = memo(({
           onClick={clearFilters}
         >
           <X className="w-4 h-4 mr-2" />
-          Clear All Filters
+          Clear All Filters ({activeFilterCount})
         </Button>
       )}
     </div>
@@ -175,15 +217,15 @@ const ProductFilters = memo(({
               <SlidersHorizontal className="w-4 h-4" />
               Filters
               {activeFilterCount > 0 && (
-                <Badge className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-xs">
+                <Badge className="ml-1 h-5 w-5 p-0 flex items-center justify-center text-xs bg-primary">
                   {activeFilterCount}
                 </Badge>
               )}
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-80">
+          <SheetContent side="left" className="w-80 bg-background">
             <SheetHeader className="mb-6">
-              <SheetTitle>Filters</SheetTitle>
+              <SheetTitle>Filter Products</SheetTitle>
             </SheetHeader>
             <FilterContent />
           </SheetContent>
@@ -192,11 +234,16 @@ const ProductFilters = memo(({
 
       {/* Desktop Sidebar */}
       <div className="hidden lg:block w-64 flex-shrink-0">
-        <div className="sticky top-24 bg-card rounded-xl border border-border p-6">
+        <div className="sticky top-24 bg-card rounded-xl border border-border p-6 shadow-sm">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="font-semibold">Filters</h3>
+            <h3 className="font-semibold flex items-center gap-2">
+              <SlidersHorizontal className="w-4 h-4 text-primary" />
+              Filters
+            </h3>
             {activeFilterCount > 0 && (
-              <Badge variant="secondary">{activeFilterCount} active</Badge>
+              <Badge variant="secondary" className="bg-primary/10 text-primary">
+                {activeFilterCount} active
+              </Badge>
             )}
           </div>
           <FilterContent />
