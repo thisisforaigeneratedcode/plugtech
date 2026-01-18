@@ -58,8 +58,14 @@ export default {
 				'heading': ['var(--font-heading)'],
 				'body': ['var(--font-body)'],
 			},
+			keyframes: {
+				shimmer: {
+					'100%': { transform: 'translateX(100%)' },
+				},
+			},
 			animation: {
 				'scroll': 'scroll 20s linear infinite',
+				'shimmer': 'shimmer 2s infinite',
 			},
 		}
 	},
