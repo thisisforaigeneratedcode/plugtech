@@ -189,12 +189,8 @@ const Footer = () => {
 
             <div className="flex items-center gap-2">
               <span>Made with ❤️ by</span>
-              <button onClick={openCnBWhatsApp} className="text-background/70 hover:text-background font-medium transition-colors">
-                CnB
-              </button>
-              <span>×</span>
-              <button onClick={openDmXWhatsApp} className="text-background/70 hover:text-background font-medium transition-colors">
-                DmX
+              <button onClick={openCnBWhatsApp} className="text-primary hover:text-primary/80 font-semibold transition-colors">
+                CnBCode
               </button>
             </div>
           </div>
