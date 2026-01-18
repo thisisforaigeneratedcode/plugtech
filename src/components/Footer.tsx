@@ -77,43 +77,48 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div className="lg:col-span-2">
-            <h4 className="text-sm font-semibold text-background uppercase tracking-wider mb-4">Shop</h4>
-            <ul className="space-y-2.5">
-              {quickLinks.map((link) => (
-                <li key={link.to}>
-                  <Link 
-                    to={link.to} 
-                    className="text-background/60 hover:text-background text-sm transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+          {/* Quick Links & Account - Side by Side */}
+          <div className="lg:col-span-4">
+            <div className="grid grid-cols-2 gap-8">
+              {/* Shop Links */}
+              <div>
+                <h4 className="text-sm font-semibold text-background uppercase tracking-wider mb-4">Shop</h4>
+                <ul className="space-y-2.5">
+                  {quickLinks.map((link) => (
+                    <li key={link.to}>
+                      <Link 
+                        to={link.to} 
+                        className="text-background/60 hover:text-background text-sm transition-colors"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-          {/* Account Links */}
-          <div className="lg:col-span-2">
-            <h4 className="text-sm font-semibold text-background uppercase tracking-wider mb-4">Account</h4>
-            <ul className="space-y-2.5">
-              <li>
-                <Link to="/wishlist" className="text-background/60 hover:text-background text-sm transition-colors">
-                  My Wishlist
-                </Link>
-              </li>
-              <li>
-                <Link to="/compare" className="text-background/60 hover:text-background text-sm transition-colors">
-                  Compare Products
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="text-background/60 hover:text-background text-sm transition-colors">
-                  Contact Us
-                </Link>
-              </li>
-            </ul>
+              {/* Account Links */}
+              <div>
+                <h4 className="text-sm font-semibold text-background uppercase tracking-wider mb-4">Account</h4>
+                <ul className="space-y-2.5">
+                  <li>
+                    <Link to="/wishlist" className="text-background/60 hover:text-background text-sm transition-colors">
+                      My Wishlist
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/compare" className="text-background/60 hover:text-background text-sm transition-colors">
+                      Compare Products
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/contact" className="text-background/60 hover:text-background text-sm transition-colors">
+                      Contact Us
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
 
           {/* Contact Info */}
