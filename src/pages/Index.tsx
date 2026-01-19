@@ -4,6 +4,7 @@ import { Laptop, Monitor, Gamepad2, HardDrive, Headphones, Settings, ArrowRight,
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ProductCarousel from '../components/ProductCarousel';
+import RecentlyViewedProducts from '../components/RecentlyViewedProducts';
 import TrustBadges from '../components/TrustBadges';
 import WhyChooseUs from '../components/WhyChooseUs';
 import FAQ from '../components/FAQ';
@@ -11,11 +12,13 @@ import StickyContact from '../components/StickyContact';
 import SEO from '../components/SEO';
 import { useProducts } from '../hooks/useProducts';
 import { useCart } from '@/contexts/CartContext';
+import { useRecentlyViewed } from '../hooks/useRecentlyViewed';
 import WhatsAppButton from '../components/WhatsAppButton';
 
 const Index = () => {
   const { products, loading } = useProducts();
   const { addItem, openCart, itemCount } = useCart();
+  const { recentlyViewed, clearAll: clearRecentlyViewed } = useRecentlyViewed();
 
   const categories = useMemo(() => [
     { 
@@ -203,6 +206,12 @@ const Index = () => {
           />
         </div>
       </section>
+
+      {/* Recently Viewed Products */}
+      <RecentlyViewedProducts
+        products={recentlyViewed}
+        onClear={clearRecentlyViewed}
+      />
 
       {/* Trust Badges */}
       <TrustBadges />

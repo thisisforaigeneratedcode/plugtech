@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ChevronRight, Home, ShoppingCart, Heart, Share2, Shield, Truck, RotateCcw, Check, Plus, Minus, Scale } from 'lucide-react';
 import Header from '../components/Header';
@@ -9,6 +9,7 @@ import WhatsAppIcon from '../components/icons/WhatsAppIcon';
 import { useProducts } from '@/hooks/useProducts';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/hooks/useWishlist';
+import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { getOptimizedImageUrl } from '@/utils/imageOptimization';
@@ -19,6 +20,7 @@ const ProductPage = () => {
   const { products, loading } = useProducts();
   const { addItem, openCart, itemCount } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
+  const { addProduct: addToRecentlyViewed } = useRecentlyViewed();
   
   const [quantity, setQuantity] = useState(1);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -29,6 +31,13 @@ const ProductPage = () => {
   );
 
   const isWishlisted = product ? isInWishlist(product.id) : false;
+
+  // Track recently viewed products
+  useEffect(() => {
+    if (product) {
+      addToRecentlyViewed(product);
+    }
+  }, [product, addToRecentlyViewed]);
 
   const relatedProducts = useMemo(() => {
     if (!product) return [];
