@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
-import EnhancedHeader from '../components/EnhancedHeader';
+import Header from '@/components/Header';
 import Footer from '../components/Footer';
 import HeroCarousel from '../components/HeroCarousel';
 import CircularCategories from '../components/CircularCategories';
@@ -45,7 +45,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <SEO />
-      <EnhancedHeader />
+      <Header />
 
       {/* Hero Carousel with Deals Ticker */}
       <HeroCarousel />

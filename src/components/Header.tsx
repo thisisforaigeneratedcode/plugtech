@@ -1,170 +1,213 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { ShoppingCart, Phone, Menu, X, Search, Heart, MapPin } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Search, ShoppingCart, Heart, Menu, X, Phone, MapPin, ChevronDown, Laptop, Monitor, Gamepad2, HardDrive, Headphones, MonitorSmartphone } from 'lucide-react';
+import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/hooks/useWishlist';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
-interface HeaderProps {
-  cartItemsCount?: number;
-  onCartOpen?: () => void;
-}
+const CATEGORIES = [
+  { name: 'Laptops', href: '/category/laptops', icon: Laptop },
+  { name: 'Desktops', href: '/category/desktops', icon: HardDrive },
+  { name: 'Gaming', href: '/category/gaming', icon: Gamepad2 },
+  { name: 'Monitors', href: '/category/monitors', icon: Monitor },
+  { name: 'All in One', href: '/category/all-in-one', icon: MonitorSmartphone },
+  { name: 'Accessories', href: '/category/accessories', icon: Headphones },
+];
 
-const Header = ({ cartItemsCount = 0, onCartOpen }: HeaderProps) => {
+const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  const { itemCount, openCart } = useCart();
+  const { count: wishlistCount } = useWishlist();
   const navigate = useNavigate();
-  const { wishlistIds } = useWishlist();
 
-  const handleSearch = (e: React.FormEvent) => {
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsCategoryDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleSearch = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     if (searchTerm.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
       setSearchTerm('');
       setIsMobileMenuOpen(false);
     }
-  };
+  }, [searchTerm, navigate]);
 
-  const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'Laptops', path: '/category/laptops' },
-    { name: 'Desktops', path: '/category/desktops' },
-    { name: 'Gaming', path: '/category/gaming' },
-    { name: 'Monitors', path: '/category/monitors' },
-    { name: 'Accessories', path: '/category/accessories' },
-    { name: 'Contact', path: '/contact' },
-  ];
+  const closeMobileMenu = useCallback(() => {
+    setIsMobileMenuOpen(false);
+  }, []);
 
   return (
-    <header className="bg-background border-b border-border sticky top-0 z-50">
-      {/* Top info bar */}
+    <header className="sticky top-0 z-50 bg-background/95 backdrop-blur-xl border-b border-border">
+      {/* Top Bar */}
       <div className="bg-foreground text-background">
-        <div className="container mx-auto px-4 py-2">
-          <div className="flex items-center justify-between text-xs sm:text-sm">
-            {/* Phone */}
-            <a href="tel:0711483989" className="flex items-center gap-1.5 hover:opacity-80 transition-opacity font-medium">
-              <Phone className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">0711 483 989</span>
-              <span className="sm:hidden">Call</span>
-            </a>
-
-            {/* Location - Center */}
-            <div className="hidden md:flex items-center gap-1.5 text-background/80">
-              <MapPin className="w-3.5 h-3.5" />
-              <span>Rasumal House, Shop 5, Tom Mboya St • Ask for Collins</span>
+        <div className="container mx-auto px-4 py-1.5">
+          <div className="flex items-center justify-between text-xs">
+            <div className="hidden sm:flex items-center gap-4">
+              <a href="tel:0711483989" className="flex items-center gap-1.5 hover:text-primary transition-colors">
+                <Phone className="w-3 h-3" />
+                <span>0711 483 989</span>
+              </a>
+              <span className="text-background/30">|</span>
+              <div className="flex items-center gap-1.5 text-background/70">
+                <MapPin className="w-3 h-3" />
+                <span className="hidden md:inline">Rasumal House, Tom Mboya St, Nairobi. Ask for Collins</span>
+                <span className="md:hidden">Nairobi CBD</span>
+              </div>
             </div>
-
-            {/* M-Pesa + Social */}
-            <div className="flex items-center gap-4">
-              {/* M-Pesa */}
-              <div className="hidden sm:flex items-center gap-2">
-                <span className="text-background/70">M-Pesa:</span>
-                <span className="font-mono font-medium bg-background/10 px-1.5 py-0.5 rounded">714888</span>
-                <span className="text-background/50">Acc:</span>
-                <span className="font-mono font-medium">281219</span>
-              </div>
-
-              {/* Socials */}
-              <div className="flex items-center gap-2">
-                <a 
-                  href="https://instagram.com/collo_thee_plug" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="hover:opacity-80 transition-opacity"
-                  aria-label="Instagram"
-                >
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                  </svg>
-                </a>
-                <a 
-                  href="https://tiktok.com/@plugtechbusiness" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="hover:opacity-80 transition-opacity"
-                  aria-label="TikTok"
-                >
-                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
-                  </svg>
-                </a>
-              </div>
+            
+            <div className="flex items-center gap-3 mx-auto sm:mx-0">
+              <span className="font-medium">M-Pesa: 714888 | Acc: 281219</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main header */}
+      {/* Main Header */}
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16 gap-4">
           {/* Logo */}
           <Link to="/" className="flex-shrink-0">
-            <span className="text-xl font-bold text-primary">Collo The Plug</span>
+            <div className="flex items-center gap-2">
+              <div className="w-9 h-9 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center shadow-md">
+                <span className="text-primary-foreground font-bold text-lg">C</span>
+              </div>
+              <div className="hidden sm:block">
+                <div className="font-bold text-foreground leading-none">Collo The Plug</div>
+                <div className="text-[10px] text-muted-foreground">Quality Computers</div>
+              </div>
+            </div>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <Link 
-                key={link.path}
-                to={link.path} 
-                className="px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-              >
-                {link.name}
-              </Link>
-            ))}
+          {/* All Categories Dropdown */}
+          <div className="hidden lg:block relative" ref={dropdownRef}>
+            <button
+              onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+              className={cn(
+                "flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all",
+                isCategoryDropdownOpen 
+                  ? "bg-primary text-primary-foreground" 
+                  : "bg-muted text-foreground hover:bg-muted/80"
+              )}
+            >
+              <Menu className="w-4 h-4" />
+              All Categories
+              <ChevronDown className={cn("w-4 h-4 transition-transform", isCategoryDropdownOpen && "rotate-180")} />
+            </button>
+
+            {/* Dropdown Menu */}
+            {isCategoryDropdownOpen && (
+              <div className="absolute top-full left-0 mt-2 w-56 bg-card rounded-xl border border-border shadow-xl py-2 animate-in slide-in-from-top-2 duration-200 z-50">
+                {CATEGORIES.map((category) => {
+                  const Icon = category.icon;
+                  return (
+                    <Link
+                      key={category.name}
+                      to={category.href}
+                      onClick={() => setIsCategoryDropdownOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-muted transition-colors"
+                    >
+                      <Icon className="w-4 h-4 text-muted-foreground" />
+                      {category.name}
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Centered Search Bar */}
+          <form
+            onSubmit={handleSearch}
+            className={cn(
+              "hidden md:flex items-center flex-1 max-w-xl mx-4 relative transition-all duration-300",
+              isSearchFocused && "max-w-2xl"
+            )}
+          >
+            <div className="relative w-full">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Search for laptops, desktops, gaming PCs..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onFocus={() => setIsSearchFocused(true)}
+                onBlur={() => setIsSearchFocused(false)}
+                className={cn(
+                  "w-full pl-11 pr-4 py-3 bg-muted border-2 border-transparent rounded-xl text-sm",
+                  "placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:bg-background transition-all"
+                )}
+              />
+            </div>
+          </form>
+
+          {/* Quick Links */}
+          <nav className="hidden xl:flex items-center gap-1">
+            <Link
+              to="/category/laptops"
+              className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Best Deals
+            </Link>
+            <Link
+              to="/contact"
+              className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Contact
+            </Link>
           </nav>
 
-          {/* Search & Actions */}
-          <div className="flex items-center gap-2">
-            {/* Search - Desktop */}
-            <form onSubmit={handleSearch} className="hidden md:block">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-48 lg:w-64 pl-9 pr-4 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                />
-              </div>
-            </form>
+          {/* Actions */}
+          <div className="flex items-center gap-1">
+            {/* Location Indicator */}
+            <div className="hidden lg:flex items-center gap-1.5 px-3 py-2 text-xs text-muted-foreground">
+              <MapPin className="w-3.5 h-3.5" />
+              <span>Nairobi</span>
+            </div>
 
-            {/* Wishlist Button */}
-            <Link
-              to="/wishlist"
-              className="relative p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-              aria-label="View wishlist"
+            {/* Wishlist */}
+            <Link 
+              to="/wishlist" 
+              className="relative p-2.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors"
             >
               <Heart className="w-5 h-5" />
-              {wishlistIds.length > 0 && (
-                <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-red-500 text-white text-xs font-medium rounded-full flex items-center justify-center">
-                  {wishlistIds.length > 9 ? '9+' : wishlistIds.length}
-                </span>
+              {wishlistCount > 0 && (
+                <Badge className="absolute -top-0.5 -right-0.5 h-4 min-w-4 p-0 flex items-center justify-center text-[10px] bg-primary border-0">
+                  {wishlistCount}
+                </Badge>
               )}
             </Link>
 
-            {/* Cart Button */}
-            {onCartOpen && (
-              <button
-                onClick={onCartOpen}
-                className="relative p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-                aria-label="Open cart"
-              >
-                <ShoppingCart className="w-5 h-5" />
-                {cartItemsCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-primary text-primary-foreground text-xs font-medium rounded-full flex items-center justify-center">
-                    {cartItemsCount > 9 ? '9+' : cartItemsCount}
-                  </span>
-                )}
-              </button>
-            )}
+            {/* Cart */}
+            <button
+              onClick={openCart}
+              className="relative p-2.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors"
+            >
+              <ShoppingCart className="w-5 h-5" />
+              {itemCount > 0 && (
+                <Badge className="absolute -top-0.5 -right-0.5 h-4 min-w-4 p-0 flex items-center justify-center text-[10px] bg-primary border-0">
+                  {itemCount > 9 ? '9+' : itemCount}
+                </Badge>
+              )}
+            </button>
 
-            {/* Mobile Menu Button */}
+            {/* Mobile Menu Toggle */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="lg:hidden p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
-              aria-label="Toggle menu"
+              className="lg:hidden p-2.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors"
             >
               {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -174,34 +217,66 @@ const Header = ({ cartItemsCount = 0, onCartOpen }: HeaderProps) => {
         {/* Mobile Search */}
         <form onSubmit={handleSearch} className="md:hidden pb-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
               placeholder="Search products..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+              className="w-full pl-11 pr-4 py-3 bg-muted border-2 border-transparent rounded-xl text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:bg-background transition-all"
             />
           </div>
         </form>
 
         {/* Mobile Menu */}
-        <div className={cn(
-          "lg:hidden overflow-hidden transition-all duration-200 ease-in-out",
-          isMobileMenuOpen ? "max-h-96 pb-4" : "max-h-0"
-        )}>
-          <nav className="flex flex-col border-t border-border pt-2">
-            {navLinks.map((link) => (
-              <Link 
-                key={link.path}
-                to={link.path} 
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="px-3 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
+        {isMobileMenuOpen && (
+          <nav className="lg:hidden pb-4 border-t border-border pt-4 animate-in slide-in-from-top-2 duration-200">
+            <div className="flex flex-col gap-1">
+              {CATEGORIES.map((category) => {
+                const Icon = category.icon;
+                return (
+                  <Link
+                    key={category.name}
+                    to={category.href}
+                    onClick={closeMobileMenu}
+                    className="flex items-center gap-3 px-4 py-3 text-foreground hover:bg-muted rounded-xl transition-colors"
+                  >
+                    <Icon className="w-5 h-5 text-muted-foreground" />
+                    {category.name}
+                  </Link>
+                );
+              })}
+              <div className="border-t border-border my-2" />
+              <Link
+                to="/contact"
+                onClick={closeMobileMenu}
+                className="px-4 py-3 text-foreground hover:bg-muted rounded-xl transition-colors"
               >
-                {link.name}
+                Contact Us
               </Link>
-            ))}
+            </div>
           </nav>
+        )}
+      </div>
+
+      {/* Category Bar - Desktop */}
+      <div className="hidden lg:block border-t border-border bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center gap-1 py-2 overflow-x-auto scroll-smooth-x">
+            {CATEGORIES.map((category) => {
+              const Icon = category.icon;
+              return (
+                <Link
+                  key={category.name}
+                  to={category.href}
+                  className="flex items-center gap-2 px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors whitespace-nowrap"
+                >
+                  <Icon className="w-4 h-4" />
+                  {category.name}
+                </Link>
+              );
+            })}
+          </div>
         </div>
       </div>
     </header>
